@@ -14,11 +14,9 @@ public class DatoPuro {
                 clases.add(fila[fila.length - 1]);
             }
             if (clases.size() > 1) {
-                System.out.println(clases);
                 return false;
             }
         }
-        System.out.println(clases);
         return true;
     }
 }

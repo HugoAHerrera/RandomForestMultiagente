@@ -1,10 +1,13 @@
 package src.main;
 
 import src.funciones.DatoPuro;
+import src.funciones.Clasificador;
+
+import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
-        String rutaArchivo = "src/data/winequality-red-categorical-one-type.csv";
+        String rutaArchivo = "src/data/winequality-red-categorical.csv";
 
         LectorFicheros lector = new LectorFicheros();
         lector.leerCSV(rutaArchivo);
@@ -15,6 +18,9 @@ public class Main {
 
         boolean esPuro = DatoPuro.comprobarPureza(lector.getContenido());
         System.out.println("Resultado: " + esPuro);
+
+        Map<String, Integer> clasificacionCategorias = Clasificador.contarClases(lector.getContenido());
+        System.out.println(clasificacionCategorias);
         /*
         for (String[] fila : arbolDecision.getDatosEntrenamiento()) {
             for (String valor : fila) {
