@@ -10,7 +10,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/Program Files (x86)/jade/lib/jade.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/jade.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

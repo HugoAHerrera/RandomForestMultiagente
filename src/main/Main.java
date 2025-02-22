@@ -7,11 +7,22 @@ public class Main {
         LectorFicheros lector = new LectorFicheros();
         lector.leerCSV(rutaArchivo);
 
-        for (String[] fila : lector.getContenido()) {
+        ArbolDecision arbolDecision = new ArbolDecision(lector.getContenido().size());
+        arbolDecision.seleccionarFilasAleatorias();
+        arbolDecision.dividirDataset(lector.getContenido());
+
+        for (String[] fila : arbolDecision.getDatosEntrenamiento()) {
             for (String valor : fila) {
                 System.out.print(valor + " ");
             }
             System.out.println();
         }
+        /*
+        for (String[] fila : lector.getContenido()) {
+            for (String valor : fila) {
+                System.out.print(valor + " ");
+            }
+            System.out.println();
+        }*/
     }
 }
