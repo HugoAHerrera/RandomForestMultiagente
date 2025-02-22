@@ -2,8 +2,10 @@ package src.main;
 
 import src.funciones.DatoPuro;
 import src.funciones.Clasificador;
+import src.funciones.SeparadorClases;
 
 import java.util.Map;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -21,6 +23,12 @@ public class Main {
 
         Map<String, Integer> clasificacionCategorias = Clasificador.contarClases(lector.getContenido());
         System.out.println(clasificacionCategorias);
+
+        Map<String, List<Double>> divisiones = SeparadorClases.obtenerPosiblesDivisiones(lector.getContenido(), lector.getCabecera());
+
+        for (Map.Entry<String, List<Double>> entry : divisiones.entrySet()) {
+            System.out.println("Columna: " + entry.getKey() + " -> Divisiones: " + entry.getValue());
+        }
         /*
         for (String[] fila : arbolDecision.getDatosEntrenamiento()) {
             for (String valor : fila) {
