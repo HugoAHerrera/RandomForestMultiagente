@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import src.funciones.Clasificador;
+import src.main.LectorFicheros;
 
 public class SeparadorEntropia {
     public List<List<String[]>> separarDatos(List<String[]> dataset, String columnaSeparacion, float valorSeparacion, String[] cabecera) {
@@ -72,6 +73,38 @@ public class SeparadorEntropia {
         float entropiaSuperiores = calcularEntropia(resultado.get(1));
 
         return (probabilidadInferiores * entropiaInferiores) + (probabilidadSuperiores * entropiaSuperiores);
+    }
+
+    public void getMejorSeparacion(LectorFicheros lector, Map<String, List<Double>> divisiones) {
+        float mejorEntropia = 999;
+        String mejorColumna = "";
+        float mejorValorSplit = 0.0f;
+
+        for (Map.Entry<String, List<Double>> entry : divisiones.entrySet()) {
+            String columna = entry.getKey();
+            List<Double> valoresSplit = entry.getValue();
+
+            for (Double valorSplit : valoresSplit) {
+                List<List<String[]>> resultado = separarDatos(
+                        lector.getContenido(),
+                        columna,
+                        valorSplit.floatValue(),
+                        lector.getCabecera()
+                );
+
+                float entropiaActual = calcularEntropiaGlobal(resultado);
+
+                if (entropiaActual <= mejorEntropia) {
+                    mejorEntropia = entropiaActual;
+                    mejorColumna = columna;
+                    mejorValorSplit = valorSplit.floatValue();
+                }
+            }
+        }
+
+        System.out.println("Mejor Entropía: " + mejorEntropia);
+        System.out.println("Mejor Columna: " + mejorColumna);
+        System.out.println("Mejor Valor Split: " + mejorValorSplit);
     }
 
 }

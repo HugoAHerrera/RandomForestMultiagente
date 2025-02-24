@@ -37,7 +37,7 @@ public class Main {
         List<String[]> datosInferiores = resultado.get(0);
         List<String[]> datosSuperiores = resultado.get(1);
 
-        System.out.println(separadorEntropia.calcularEntropiaGlobal(resultado));
+        separadorEntropia.getMejorSeparacion(lector, divisiones);
         /*
         System.out.println("\n\nDatos inferiores:");
         for(String[] fila: datosInferiores){
