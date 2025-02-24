@@ -37,6 +37,11 @@ public class Main {
         List<String[]> datosInferiores = resultado.get(0);
         List<String[]> datosSuperiores = resultado.get(1);
 
+        for(List<String[]> datos: resultado){
+            float entropia_datos = separadorEntropia.calcularEntropia(datos);
+            System.out.println("Entropia: " + entropia_datos);
+        }
+        /*
         System.out.println("\n\nDatos inferiores:");
         for(String[] fila: datosInferiores){
             System.out.println(String.join(", ", fila));
@@ -47,7 +52,7 @@ public class Main {
             System.out.println(String.join(", ", fila));
         }
 
-        /*
+
         for(String[] fila: lector.getContenido()){
             System.out.println(String.join(", ", fila));
         }
