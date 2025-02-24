@@ -54,4 +54,24 @@ public class SeparadorEntropia {
 
         return probabilidades;
     }
+
+    public static float calcularEntropiaGlobal(List<List<String[]>> resultado) {
+        int tamañoInferiores = resultado.get(0).size();
+        int tamañoSuperiores = resultado.get(1).size();
+
+        int tamañoGlobal = tamañoInferiores + tamañoSuperiores;
+
+        if (tamañoGlobal == 0) {
+            return 0.0f;
+        }
+
+        float probabilidadInferiores = (float) tamañoInferiores / tamañoGlobal;
+        float probabilidadSuperiores = (float) tamañoSuperiores / tamañoGlobal;
+
+        float entropiaInferiores = calcularEntropia(resultado.get(0));
+        float entropiaSuperiores = calcularEntropia(resultado.get(1));
+
+        return (probabilidadInferiores * entropiaInferiores) + (probabilidadSuperiores * entropiaSuperiores);
+    }
+
 }
