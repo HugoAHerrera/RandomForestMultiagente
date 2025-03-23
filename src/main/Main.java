@@ -204,8 +204,8 @@ public class Main {
         List<String[]> datos_evaluacion = arbolDecision.getDatosTest();
         String[] cabecera = lectorCsv.getCabecera();
 
-        for (int maxDepth = 2; maxDepth <= 20; maxDepth++) {
-            for (int minSamples = 5; minSamples <= 30; minSamples += 5) {
+        for (int max_profundidad = 2; max_profundidad <= 20; max_profundidad++) {
+            for (int min_num_muestras = 5; min_num_muestras <= 30; min_num_muestras += 5) {
                 Object arbol = arbolDecision.crearArbolDecision(
                         datos_train,
                         cabecera,
@@ -213,7 +213,7 @@ public class Main {
                         lectorCsv,
                         divisiones,
                         0,
-                        maxDepth,
+                        max_profundidad,
                         clasificacionesColumnas,
                         "regresion"
                 );
@@ -221,8 +221,8 @@ public class Main {
                 double rCuadradoTrain = calcularRCuadrado(datos_train, arbol, cabecera);
                 double rCuadradoVal = calcularRCuadrado(datos_evaluacion, arbol, cabecera);
 
-                resultadosBusqueda.get("max_profundidad").add(maxDepth);
-                resultadosBusqueda.get("min_num_muestras").add(minSamples);
+                resultadosBusqueda.get("max_profundidad").add(max_profundidad);
+                resultadosBusqueda.get("min_num_muestras").add(min_num_muestras);
                 resultadosBusqueda.get("r_cuadrado_train").add(rCuadradoTrain);
                 resultadosBusqueda.get("r_cuadrado_val").add(rCuadradoVal);
             }
