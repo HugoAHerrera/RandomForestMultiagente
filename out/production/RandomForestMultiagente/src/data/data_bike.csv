@@ -1,0 +1,6 @@
+season,yr,mnth,holiday,weekday,workingday,weathersit,temp,atemp,hum,windspeed,day_of_year,day_of_month,quarter,week,is_month_end,is_month_start,is_quarter_end,is_quarter_start,is_year_end,is_year_start,label
+1,0,1,0,6,0,2,0.344167,0.363625,0.805833,0.160446,1,1,1,52,False,True,False,True,False,True,985
+1,0,1,0,0,0,2,0.363478,0.353739,0.696087,0.248539,2,2,1,52,False,False,False,False,False,False,801
+1,0,1,0,1,1,1,0.196364,0.189405,0.437273,0.248309,3,3,1,1,False,False,False,False,False,False,1349
+1,0,1,0,2,1,1,0.2,0.212122,0.590435,0.160296,4,4,1,1,False,False,False,False,False,False,1562
+1,0,1,0,3,1,1,0.226957,0.22927,0.436957,0.1869,5,5,1,1,False,False,False,False,False,False,1600
