@@ -58,9 +58,19 @@ public class ArbolDecision {
     }
 
     public Object crearArbolDecision(List<String[]> datos, String[] cabecera, int contador, LectorFicheros lector, Map<String, List<String>> divisiones, int min_num_muestras, int max_profundidad, List<String> clasificacionesColumnas, String funcionModelo) {
+
         if (DatoPuro.comprobarPureza(datos) || (datos.size() < min_num_muestras) || (max_profundidad == contador)) {
-            // Clase pasa a ser hoja
-            String clase = Clasificador.contarClases(datos, funcionModelo).keySet().iterator().next();
+            //Devolver el más probable
+            Map<String, Double> resultado = Clasificador.contarClases(datos, funcionModelo);
+            String clase = null;
+            double maxValor = Double.NEGATIVE_INFINITY;
+
+            for (Map.Entry<String, Double> entry : resultado.entrySet()) {
+                if (entry.getValue() > maxValor) {
+                    maxValor = entry.getValue();
+                    clase = entry.getKey();
+                }
+            }
             return clase;
         }
 

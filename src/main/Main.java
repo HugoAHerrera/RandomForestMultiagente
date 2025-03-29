@@ -23,6 +23,9 @@ public class Main {
         String data2 = "src/data/train_bike.csv";
         String data3 = "src/data/val_bike.csv";
 
+        String data4 = "src/data/pruebas_train.csv";
+        String data5 = "src/data/pruebas_val.csv";
+
 
         /*
         LectorFicheros lectorPruebas = new LectorFicheros();
@@ -48,19 +51,19 @@ public class Main {
         arbolDecision.cargarDatosTest(lector_test.getContenido());
         */
         LectorFicheros lectorCsv = new LectorFicheros();
-        lectorCsv.leerCSV(data2);
+        lectorCsv.leerCSV(rutaArchivo);
 
         LectorFicheros lector2Csv = new LectorFicheros();
-        lector2Csv.leerCSV(data3);
+        lector2Csv.leerCSV(data5);
 
         List<String> clasificacionesColumnas = Clasificador.determinarTipoColumna(lectorCsv.getContenido(), lectorCsv.getCabecera());
 
         ArbolDecision arbolDecision = new ArbolDecision(lectorCsv.getContenido().size());
 
-        //arbolDecision.seleccionarFilasAleatorias();
-        //arbolDecision.dividirDataset(lectorCsv.getContenido());
-        arbolDecision.cargarDatosTrain(lectorCsv.getContenido());
-        arbolDecision.cargarDatosTest(lector2Csv.getContenido());
+        arbolDecision.seleccionarFilasAleatorias();
+        arbolDecision.dividirDataset(lectorCsv.getContenido());
+        //arbolDecision.cargarDatosTrain(lectorCsv.getContenido());
+        //arbolDecision.cargarDatosTest(lector2Csv.getContenido());
 
         Map<String, List<String>> divisiones = SeparadorClases.obtenerPosiblesDivisiones(arbolDecision.getDatosEntrenamiento(), lectorCsv.getCabecera(), clasificacionesColumnas);
 
@@ -71,18 +74,18 @@ public class Main {
                 lectorCsv,
                 divisiones,
                 0,
-                3,
+                1,
                 clasificacionesColumnas,
-                "regresion"
+                "clasificacion"
         );
 
         imprimirArbol(arbol, 0);
 
         //Esto solo en clasificacion
-        //evaluarArbol(arbol, arbolDecision.getDatosTest(), lectorCsv.getCabecera());
+        evaluarArbol(arbol, arbolDecision.getDatosTest(), lectorCsv.getCabecera());
 
         //Para regresión
-        mejorProfundidadRegresion(arbolDecision, lectorCsv, divisiones, clasificacionesColumnas);
+        //mejorProfundidadRegresion(arbolDecision, lectorCsv, divisiones, clasificacionesColumnas);
     }
 
     public static void imprimirArbol(Object nodo, int nivel) {
@@ -122,6 +125,7 @@ public class Main {
             Object[] ramas = (Object[]) nodoMapa.get(pregunta);
 
             if (pregunta.contains(" <= ")) {
+                //System.out.println("Pregunta " + pregunta);
                 String[] partes = pregunta.split(" <= ");
                 String columna = partes[0];
                 double valorComparacion = Double.parseDouble(partes[1]);
