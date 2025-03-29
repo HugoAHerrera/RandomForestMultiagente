@@ -18,7 +18,8 @@ public class Main {
         String rutaTest = "src/data/test2.csv";
         String rutaTrain = "src/data/train2.csv";
         String rutaDataSet = "src/data/dataset.csv";
-        String rutaTitanic = "src/data/titanic.csv";
+        String rutaTitanic = "src/data/titanic_podas_t.csv";
+        String rutaTitanicTrain = "src/data/titanic_podas_train.csv";
 
         String data2 = "src/data/train_bike.csv";
         String data3 = "src/data/val_bike.csv";
@@ -51,10 +52,10 @@ public class Main {
         arbolDecision.cargarDatosTest(lector_test.getContenido());
         */
         LectorFicheros lectorCsv = new LectorFicheros();
-        lectorCsv.leerCSV(data4);
+        lectorCsv.leerCSV(rutaTitanic);
 
         LectorFicheros lector2Csv = new LectorFicheros();
-        lector2Csv.leerCSV(data5);
+        lector2Csv.leerCSV(rutaTitanicTrain);
 
         List<String> clasificacionesColumnas = Clasificador.determinarTipoColumna(lectorCsv.getContenido(), lectorCsv.getCabecera());
 
@@ -62,10 +63,12 @@ public class Main {
 
         //arbolDecision.seleccionarFilasAleatorias();
         //arbolDecision.dividirDataset(lectorCsv.getContenido());
-        arbolDecision.cargarDatosTrain(lectorCsv.getContenido());
-        arbolDecision.cargarDatosTest(lector2Csv.getContenido());
+        arbolDecision.cargarDatosTrain(lector2Csv.getContenido());
+        arbolDecision.cargarDatosTest(lectorCsv.getContenido());
 
         Map<String, List<String>> divisiones = SeparadorClases.obtenerPosiblesDivisiones(arbolDecision.getDatosEntrenamiento(), lectorCsv.getCabecera(), clasificacionesColumnas);
+
+        String tarea = "regresion";
 
         Object arbol = arbolDecision.crearArbolDecision(
                 arbolDecision.getDatosEntrenamiento(),
@@ -74,40 +77,30 @@ public class Main {
                 lectorCsv,
                 divisiones,
                 0,
-                1
-                ,
+                10,
                 clasificacionesColumnas,
-                "clasificacion"
+                tarea
         );
 
-        imprimirArbol(arbol, 0);
+        //imprimirArbol(arbol, 0);
 
         //Esto solo en clasificacion
         //evaluarArbol(arbol, arbolDecision.getDatosTest(), lectorCsv.getCabecera());
-        int[] resultado = evaluarArbol(arbol, arbolDecision.getDatosTest(), lectorCsv.getCabecera());
+        /*int[] resultado = evaluarArbol(arbol, arbolDecision.getDatosTest(), lectorCsv.getCabecera());
         double precision = (double) resultado[0] / resultado[1] * 100;
-        System.out.println("Precisión del árbol: " + precision + "%");
+        System.out.println("Precisión del árbol: " + precision + "%");*/
 
         //Para regresión
         //mejorProfundidadRegresion(arbolDecision, lectorCsv, divisiones, clasificacionesColumnas);
 
-        String pregunta = "x <= 5.05";
-        Object[] respuestas = new Object[]{
-                new HashMap<String, Object>() {{
-                    put("y <= 5", new Object[]{"True", "False"});
-                }},
-                "False"
-        };
+        Object arbolPodado = podaArbol(arbol, arbolDecision.getDatosEntrenamiento(), arbolDecision.getDatosTest(), lectorCsv.getCabecera(), tarea);
 
-        Map<String, Object> arbol_pruebas = new HashMap<>();
-        arbol_pruebas.put(pregunta, respuestas);
-
-        Object arbolPodado = podaArbol(arbol_pruebas, lectorCsv.getContenido(), lector2Csv.getContenido(), lectorCsv.getCabecera());
-        imprimirArbol(arbolPodado, 0);
+        System.out.println(calcularRCuadrado(arbolDecision.getDatosTest(), arbol, lectorCsv.getCabecera()));
+        System.out.println(calcularRCuadrado(arbolDecision.getDatosTest(), arbolPodado, lectorCsv.getCabecera()));
     }
 
 
-    public static Object podaArbol(Object arbol, List<String[]> datosTrain, List<String[]> datosVal, String[] cabecera) {
+    public static Object podaArbol(Object arbol, List<String[]> datosTrain, List<String[]> datosVal, String[] cabecera, String funcionModelo) {
         if (!(arbol instanceof Map)) {
             return arbol;
         }
@@ -117,20 +110,19 @@ public class Main {
         Object[] ramas = (Object[]) nodo.get(pregunta);
 
         if (ramas[0] instanceof String && ramas[1] instanceof String) {
-            System.out.println("Pregunta analizada " + pregunta);
-            return podaRama(arbol, datosTrain, datosVal, cabecera);
+            return podaRama(arbol, datosTrain, datosVal, cabecera, funcionModelo);
         }else{
             List<List<String[]>> resultadoTrain = filtrarDatos(datosTrain, pregunta, cabecera);
             List<List<String[]>> resultadoVal = filtrarDatos(datosVal, pregunta, cabecera);
 
             if (ramas[0] instanceof Map) {
-                ramas[0] = podaArbol(ramas[0], resultadoTrain.get(0), resultadoVal.get(0), cabecera);
+                ramas[0] = podaArbol(ramas[0], resultadoTrain.get(0), resultadoVal.get(0), cabecera, funcionModelo);
             }
             if (ramas[1] instanceof Map) {
-                ramas[1] = podaArbol(ramas[1], resultadoTrain.get(1), resultadoVal.get(1), cabecera);
+                ramas[1] = podaArbol(ramas[1], resultadoTrain.get(1), resultadoVal.get(1), cabecera, funcionModelo);
             }
 
-            return podaRama(arbol, datosTrain, datosVal, cabecera);
+            return podaRama(arbol, datosTrain, datosVal, cabecera, funcionModelo);
         }
     }
 
@@ -177,39 +169,94 @@ public class Main {
         return Arrays.asList(listaCumpleCondicion, listaNoCumpleCondicion);
     }
 
-    public static Object podaRama(Object arbol, List<String[]> datosTrain, List<String[]> datosVal, String[] cabecera) {
-        Map<String, Double> clasificacionCategorias = Clasificador.contarClases(datosTrain, "clasificacion");
+    public static Object podaRama(Object arbol, List<String[]> datosTrain, List<String[]> datosVal, String[] cabecera, String funcionModelo) {
+        if(funcionModelo.equals("clasificacion")){
+            String hojaSustituta = determinarHoja(datosTrain, funcionModelo, cabecera);
 
-        String claseMayoritaria = null;
-        double maxValor = Double.NEGATIVE_INFINITY;
+            Double erroresHojaSustituta = calcularErroresHoja(hojaSustituta, datosTrain, datosVal, cabecera, funcionModelo, arbol);
 
-        for (Map.Entry<String, Double> entry : clasificacionCategorias.entrySet()) {
-            if (entry.getValue() > maxValor) {
-                maxValor = entry.getValue();
-                claseMayoritaria = entry.getKey();
+            int[] resultado = evaluarArbol(arbol, datosVal, cabecera);
+            Double erroresNodo = Double.valueOf(resultado[1] - resultado[0]);
+
+            if (erroresHojaSustituta <= erroresNodo) {
+                return hojaSustituta;
             }
-        }
+            return arbol;
+        }else{
+            String hojaSustituta = determinarHoja(datosTrain, funcionModelo, cabecera);
 
-        String hojaSustituta = claseMayoritaria;
+            Double erroresHojaSustituta = calcularErroresHoja(hojaSustituta, datosTrain, datosVal, cabecera, funcionModelo, arbol);
 
-        Map<String, Double> clasificacionVal = Clasificador.contarClases(datosVal, "clasificacion");
-        int erroresHojaSustituta = 0;
-
-        for (Map.Entry<String, Double> entry : clasificacionVal.entrySet()) {
-            if (!entry.getKey().equals(hojaSustituta)) {
-                erroresHojaSustituta += entry.getValue().intValue();
+            Double erroresNodo = calcularRCuadrado(datosVal, arbol, cabecera);
+            //System.out.println("Error hoja " + erroresHojaSustituta + ", arbol:" + erroresNodo);
+            if (erroresHojaSustituta <= erroresNodo) {
+                return hojaSustituta;
             }
+            return arbol;
         }
-
-        int[] resultado = evaluarArbol(arbol, datosVal, cabecera);
-        int erroresNodo = resultado[1] - resultado[0];
-
-        if (erroresHojaSustituta <= erroresNodo) {
-            return hojaSustituta;
-        }
-        return arbol;
     }
 
+    public static Double calcularErroresHoja(String hoja, List<String[]> datosTrain, List<String[]> datosVal, String[] cabecera, String funcionModelo, Object arbol){
+        if(funcionModelo.equals("clasificacion")){
+            Map<String, Double> clasificacionVal = Clasificador.contarClases(datosVal, "clasificacion");
+            int erroresHojaSustituta = 0;
+
+            for (Map.Entry<String, Double> entry : clasificacionVal.entrySet()) {
+                if (!entry.getKey().equals(hoja)) {
+                    erroresHojaSustituta += entry.getValue().intValue();
+                }
+            }
+            return Double.valueOf(erroresHojaSustituta);
+        }else{
+            double sumaErrores = 0;
+            int total = 0;
+
+            for(String[] fila: datosVal){
+                String muestra = String.join(",", Arrays.copyOf(fila, fila.length - 1));
+                String valorRealStr = fila[fila.length - 1];
+                double valorReal = Double.parseDouble(valorRealStr);
+
+                String prediccionStr = predecir(arbol, muestra, cabecera);
+                double prediccion = Double.parseDouble(prediccionStr);
+                double errorCuadratico = Math.pow(valorReal - prediccion, 2);
+                sumaErrores += errorCuadratico;
+                total++;
+            }
+
+            return Double.valueOf(sumaErrores / total);
+        }
+    }
+
+    public static String determinarHoja(List<String[]> datosTrain, String funcionModelo, String[] cabecera){
+        if(funcionModelo.equals("clasificacion")){
+            Map<String, Double> clasificacionCategorias = Clasificador.contarClases(datosTrain, funcionModelo);
+
+            String claseMayoritaria = null;
+            double maxValor = Double.NEGATIVE_INFINITY;
+
+            for (Map.Entry<String, Double> entry : clasificacionCategorias.entrySet()) {
+                if (entry.getValue() > maxValor) {
+                    maxValor = entry.getValue();
+                    claseMayoritaria = entry.getKey();
+                }
+            }
+            return claseMayoritaria;
+        }else{
+            int indiceColumna = Arrays.asList(cabecera).indexOf("Fila_regresion");
+
+            double suma = 0;
+            int contador = 0;
+
+            for (String[] fila : datosTrain) {
+                String valorDato = fila[indiceColumna];
+
+                double valor = Double.parseDouble(valorDato);
+                suma += valor;
+                contador++;
+            }
+            return String.valueOf(suma / contador);
+        }
+    }
 
     public static int[] evaluarArbol(Object arbol, List<String[]> datos, String[] cabecera) {
         int total = 0;
