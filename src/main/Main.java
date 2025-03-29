@@ -24,7 +24,7 @@ public class Main {
         String data3 = "src/data/val_bike.csv";
 
         String data4 = "src/data/pruebas_train.csv";
-        String data5 = "src/data/pruebas_val2.csv";
+        String data5 = "src/data/pruebas_val.csv";
 
 
         /*
@@ -92,64 +92,124 @@ public class Main {
         //mejorProfundidadRegresion(arbolDecision, lectorCsv, divisiones, clasificacionesColumnas);
 
         String pregunta = "x <= 5.05";
-        Object[] respuestas = new Object[]{"True", "False"};
+        Object[] respuestas = new Object[]{
+                new HashMap<String, Object>() {{
+                    put("y <= 5", new Object[]{"True", "False"});
+                }},
+                "False"
+        };
 
         Map<String, Object> arbol_pruebas = new HashMap<>();
         arbol_pruebas.put(pregunta, respuestas);
 
-        Object arbolPodado = podaPostOrden(arbol_pruebas, lectorCsv.getContenido(), lector2Csv.getContenido(), lectorCsv.getCabecera());
+        Object arbolPodado = podaArbol(arbol_pruebas, lectorCsv.getContenido(), lector2Csv.getContenido(), lectorCsv.getCabecera());
         imprimirArbol(arbolPodado, 0);
     }
 
 
-    public static Object podaPostOrden(Object arbol, List<String[]> datosTrain, List<String[]> datosVal, String[] cabecera) {
+    public static Object podaArbol(Object arbol, List<String[]> datosTrain, List<String[]> datosVal, String[] cabecera) {
         if (!(arbol instanceof Map)) {
-            return arbol; // Si el nodo es una hoja, no cambios
+            return arbol;
         }
 
         Map<String, Object> nodo = (Map<String, Object>) arbol;
         String pregunta = nodo.keySet().iterator().next();
         Object[] ramas = (Object[]) nodo.get(pregunta);
 
-        Object ramaIzquierdaPodada = podaPostOrden(ramas[0], datosTrain, datosVal, cabecera);
-        Object ramaDerechaPodada = podaPostOrden(ramas[1], datosTrain, datosVal, cabecera);
+        if (ramas[0] instanceof String && ramas[1] instanceof String) {
+            System.out.println("Pregunta analizada " + pregunta);
+            return podaRama(arbol, datosTrain, datosVal, cabecera);
+        }else{
+            List<List<String[]>> resultadoTrain = filtrarDatos(datosTrain, pregunta, cabecera);
+            List<List<String[]>> resultadoVal = filtrarDatos(datosVal, pregunta, cabecera);
 
-        nodo.put(pregunta, new Object[]{ramaIzquierdaPodada, ramaDerechaPodada});
-
-        if (ramaIzquierdaPodada instanceof String && ramaDerechaPodada instanceof String) {
-            Map<String, Double> clasificacionCategorias = Clasificador.contarClases(datosTrain, "clasificacion");
-
-            String claseMayoritaria = null;
-            double maxValor = Double.NEGATIVE_INFINITY;
-
-            for (Map.Entry<String, Double> entry : clasificacionCategorias.entrySet()) {
-                if (entry.getValue() > maxValor) {
-                    maxValor = entry.getValue();
-                    claseMayoritaria = entry.getKey();
-                }
+            if (ramas[0] instanceof Map) {
+                ramas[0] = podaArbol(ramas[0], resultadoTrain.get(0), resultadoVal.get(0), cabecera);
+            }
+            if (ramas[1] instanceof Map) {
+                ramas[1] = podaArbol(ramas[1], resultadoTrain.get(1), resultadoVal.get(1), cabecera);
             }
 
-            String hojaSustituta = claseMayoritaria;
+            return podaRama(arbol, datosTrain, datosVal, cabecera);
+        }
+    }
 
-            Map<String, Double> clasificacionVal = Clasificador.contarClases(datosVal, "clasificacion");
-            int erroresHojaSustituta = 0;
+    public static List<List<String[]>> filtrarDatos(List<String[]> datos, String pregunta, String[] cabecera) {
+        //System.out.println("Pregunta analizada " + pregunta);
 
-            for (Map.Entry<String, Double> entry : clasificacionVal.entrySet()) {
-                if (!entry.getKey().equals(hojaSustituta)) {
-                    erroresHojaSustituta += entry.getValue().intValue();
+        String[] partes = pregunta.split(" <= ");
+        boolean esNumerico = true;
+
+        if (partes.length != 2) {
+            partes = pregunta.split(" == ");
+            esNumerico = false;
+        }
+
+        String columna = partes[0];
+        String valorComparacion = partes[1];
+
+        int indiceColumna = Arrays.asList(cabecera).indexOf(columna);
+
+        List<String[]> listaCumpleCondicion = new ArrayList<>();
+        List<String[]> listaNoCumpleCondicion = new ArrayList<>();
+
+        for (String[] fila : datos) {
+            String valorDato = fila[indiceColumna];
+
+            if (esNumerico) {
+                double valor = Double.parseDouble(valorDato);
+                double comparador = Double.parseDouble(valorComparacion);
+
+                if (valor <= comparador) {
+                    listaCumpleCondicion.add(fila);
+                } else {
+                    listaNoCumpleCondicion.add(fila);
                 }
-            }
-
-            int[] resultado = evaluarArbol(arbol, datosVal, cabecera);
-            int erroresNodo = resultado[1] - resultado[0];
-
-            if (erroresHojaSustituta <= erroresNodo) {
-                return hojaSustituta;
+            } else {
+                if (valorDato.equals(valorComparacion)) {
+                    listaCumpleCondicion.add(fila);
+                } else {
+                    listaNoCumpleCondicion.add(fila);
+                }
             }
         }
 
-        return nodo;
+        return Arrays.asList(listaCumpleCondicion, listaNoCumpleCondicion);
     }
+
+    public static Object podaRama(Object arbol, List<String[]> datosTrain, List<String[]> datosVal, String[] cabecera) {
+        Map<String, Double> clasificacionCategorias = Clasificador.contarClases(datosTrain, "clasificacion");
+
+        String claseMayoritaria = null;
+        double maxValor = Double.NEGATIVE_INFINITY;
+
+        for (Map.Entry<String, Double> entry : clasificacionCategorias.entrySet()) {
+            if (entry.getValue() > maxValor) {
+                maxValor = entry.getValue();
+                claseMayoritaria = entry.getKey();
+            }
+        }
+
+        String hojaSustituta = claseMayoritaria;
+
+        Map<String, Double> clasificacionVal = Clasificador.contarClases(datosVal, "clasificacion");
+        int erroresHojaSustituta = 0;
+
+        for (Map.Entry<String, Double> entry : clasificacionVal.entrySet()) {
+            if (!entry.getKey().equals(hojaSustituta)) {
+                erroresHojaSustituta += entry.getValue().intValue();
+            }
+        }
+
+        int[] resultado = evaluarArbol(arbol, datosVal, cabecera);
+        int erroresNodo = resultado[1] - resultado[0];
+
+        if (erroresHojaSustituta <= erroresNodo) {
+            return hojaSustituta;
+        }
+        return arbol;
+    }
+
 
     public static int[] evaluarArbol(Object arbol, List<String[]> datos, String[] cabecera) {
         int total = 0;
