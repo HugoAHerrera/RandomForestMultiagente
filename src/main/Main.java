@@ -24,7 +24,7 @@ public class Main {
         String data3 = "src/data/val_bike.csv";
 
         String data4 = "src/data/pruebas_train.csv";
-        String data5 = "src/data/pruebas_val.csv";
+        String data5 = "src/data/pruebas_val2.csv";
 
 
         /*
@@ -51,7 +51,7 @@ public class Main {
         arbolDecision.cargarDatosTest(lector_test.getContenido());
         */
         LectorFicheros lectorCsv = new LectorFicheros();
-        lectorCsv.leerCSV(rutaArchivo);
+        lectorCsv.leerCSV(data4);
 
         LectorFicheros lector2Csv = new LectorFicheros();
         lector2Csv.leerCSV(data5);
@@ -60,10 +60,10 @@ public class Main {
 
         ArbolDecision arbolDecision = new ArbolDecision(lectorCsv.getContenido().size());
 
-        arbolDecision.seleccionarFilasAleatorias();
-        arbolDecision.dividirDataset(lectorCsv.getContenido());
-        //arbolDecision.cargarDatosTrain(lectorCsv.getContenido());
-        //arbolDecision.cargarDatosTest(lector2Csv.getContenido());
+        //arbolDecision.seleccionarFilasAleatorias();
+        //arbolDecision.dividirDataset(lectorCsv.getContenido());
+        arbolDecision.cargarDatosTrain(lectorCsv.getContenido());
+        arbolDecision.cargarDatosTest(lector2Csv.getContenido());
 
         Map<String, List<String>> divisiones = SeparadorClases.obtenerPosiblesDivisiones(arbolDecision.getDatosEntrenamiento(), lectorCsv.getCabecera(), clasificacionesColumnas);
 
@@ -74,7 +74,8 @@ public class Main {
                 lectorCsv,
                 divisiones,
                 0,
-                1,
+                1
+                ,
                 clasificacionesColumnas,
                 "clasificacion"
         );
@@ -82,10 +83,91 @@ public class Main {
         imprimirArbol(arbol, 0);
 
         //Esto solo en clasificacion
-        evaluarArbol(arbol, arbolDecision.getDatosTest(), lectorCsv.getCabecera());
+        //evaluarArbol(arbol, arbolDecision.getDatosTest(), lectorCsv.getCabecera());
+        int[] resultado = evaluarArbol(arbol, arbolDecision.getDatosTest(), lectorCsv.getCabecera());
+        double precision = (double) resultado[0] / resultado[1] * 100;
+        System.out.println("Precisión del árbol: " + precision + "%");
 
         //Para regresión
         //mejorProfundidadRegresion(arbolDecision, lectorCsv, divisiones, clasificacionesColumnas);
+
+        String pregunta = "x <= 5.05";
+        Object[] respuestas = new Object[]{"True", "False"};
+
+        Map<String, Object> arbol_pruebas = new HashMap<>();
+        arbol_pruebas.put(pregunta, respuestas);
+
+        Object arbolPodado = podaPostOrden(arbol_pruebas, lectorCsv.getContenido(), lector2Csv.getContenido(), lectorCsv.getCabecera());
+        imprimirArbol(arbolPodado, 0);
+    }
+
+
+    public static Object podaPostOrden(Object arbol, List<String[]> datosTrain, List<String[]> datosVal, String[] cabecera) {
+        if (!(arbol instanceof Map)) {
+            return arbol; // Si el nodo es una hoja, no cambios
+        }
+
+        Map<String, Object> nodo = (Map<String, Object>) arbol;
+        String pregunta = nodo.keySet().iterator().next();
+        Object[] ramas = (Object[]) nodo.get(pregunta);
+
+        Object ramaIzquierdaPodada = podaPostOrden(ramas[0], datosTrain, datosVal, cabecera);
+        Object ramaDerechaPodada = podaPostOrden(ramas[1], datosTrain, datosVal, cabecera);
+
+        nodo.put(pregunta, new Object[]{ramaIzquierdaPodada, ramaDerechaPodada});
+
+        if (ramaIzquierdaPodada instanceof String && ramaDerechaPodada instanceof String) {
+            Map<String, Double> clasificacionCategorias = Clasificador.contarClases(datosTrain, "clasificacion");
+
+            String claseMayoritaria = null;
+            double maxValor = Double.NEGATIVE_INFINITY;
+
+            for (Map.Entry<String, Double> entry : clasificacionCategorias.entrySet()) {
+                if (entry.getValue() > maxValor) {
+                    maxValor = entry.getValue();
+                    claseMayoritaria = entry.getKey();
+                }
+            }
+
+            String hojaSustituta = claseMayoritaria;
+
+            Map<String, Double> clasificacionVal = Clasificador.contarClases(datosVal, "clasificacion");
+            int erroresHojaSustituta = 0;
+
+            for (Map.Entry<String, Double> entry : clasificacionVal.entrySet()) {
+                if (!entry.getKey().equals(hojaSustituta)) {
+                    erroresHojaSustituta += entry.getValue().intValue();
+                }
+            }
+
+            int[] resultado = evaluarArbol(arbol, datosVal, cabecera);
+            int erroresNodo = resultado[1] - resultado[0];
+
+            if (erroresHojaSustituta <= erroresNodo) {
+                return hojaSustituta;
+            }
+        }
+
+        return nodo;
+    }
+
+    public static int[] evaluarArbol(Object arbol, List<String[]> datos, String[] cabecera) {
+        int total = 0;
+        int aciertos = 0;
+
+        for (String[] fila : datos) {
+            String muestra = String.join(",", Arrays.copyOf(fila, fila.length - 1));
+            String valorReal = fila[fila.length - 1];
+
+            String prediccion = predecir(arbol, muestra, cabecera);
+
+            if (prediccion.equals(valorReal)) {
+                aciertos++;
+            }
+            total++;
+        }
+
+        return new int[]{aciertos, total};
     }
 
     public static void imprimirArbol(Object nodo, int nivel) {
@@ -142,27 +224,6 @@ public class Main {
         }
 
         return "Error en la clasificación";
-    }
-
-
-    public static void evaluarArbol(Object arbol, List<String[]> datosTest, String[] cabecera) {
-        int total = 0;
-        int aciertos = 0;
-
-        for (String[] fila : datosTest) {
-            String muestra = String.join(",", Arrays.copyOf(fila, fila.length - 1));
-            String valorReal = fila[fila.length - 1];
-
-            String prediccion = predecir(arbol, muestra, cabecera);
-
-            if (prediccion.equals(valorReal)) {
-                aciertos++;
-            }
-            total++;
-        }
-
-        double precision = (double) aciertos / total * 100;
-        System.out.println("Precisión del árbol: " + precision + "%");
     }
 
     public static double calcularRCuadrado(List<String[]> datos, Object arbol, String[] cabecera) {
