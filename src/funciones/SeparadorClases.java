@@ -15,8 +15,6 @@ public class SeparadorClases {
         Collections.shuffle(indicesColumnas);
         indicesColumnas = indicesColumnas.subList(0, Math.min(numeroColumnas, indicesColumnas.size()));
 
-        System.out.println("Columnas seleccionadas" + indicesColumnas);
-
         for (int col : indicesColumnas) {
             String tipoColumna = clasificacionesColumnas.get(col);
             Set<String> valoresUnicos = new TreeSet<>();
