@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Collections;
 
 public class Main {
+    static Double precisionGlobal = 0.0;
 
     public static void main(String[] args) {
         String rutaArchivo = "src/data/winequality-red-categorical.csv";
@@ -29,17 +30,17 @@ public class Main {
         String data5 = "src/data/pruebas_val.csv";
 
         LectorFicheros lectorCsv = new LectorFicheros();
-        lectorCsv.leerCSV(rutaDataSet);
+        lectorCsv.leerCSV(rutaArchivo);
 
         LectorFicheros lector2Csv = new LectorFicheros();
         lector2Csv.leerCSV(rutaTest);
 
-        int numeroArboles = 40;
+        int numeroArboles = 20;
         List<Object> arboles = generarRandomForest(lectorCsv, numeroArboles);
 
-        String muestra= "5.4,1.7,6.0,1.4";
+        //String muestra= "5.4,1.7,6.0,1.4";
 
-        System.out.println("Predicción: " + obtenerPrediccion(arboles, muestra, lectorCsv.getCabecera()));
+        //System.out.println("Predicción: " + obtenerPrediccion(arboles, muestra, lectorCsv.getCabecera()));
     }
 
     public static String obtenerPrediccion(List<Object> arboles, String muestra, String[] cabecera) {
@@ -54,6 +55,7 @@ public class Main {
             conteoPredicciones.put(resultadoArbol, conteoPredicciones.getOrDefault(resultadoArbol, 0) + 1);
         }
         System.out.println("Resultados:" + conteoPredicciones);
+
         return Collections.max(conteoPredicciones.entrySet(), Map.Entry.comparingByValue()).getKey();
     }
 
@@ -81,7 +83,7 @@ public class Main {
 
             Map<String, List<String>> divisiones = SeparadorClases.obtenerPosiblesDivisiones(arbolDecision.getDatosEntrenamiento(), lectorCsv.getCabecera(), clasificacionesColumnas, numeroColumnasDivisionesPotenciales);
 
-            System.out.println("Generando arbol " + i);
+            //System.out.println("Generando arbol " + i);
 
             Object arbol = arbolDecision.crearArbolDecision(
                     arbolDecision.getDatosEntrenamiento(),
@@ -89,8 +91,8 @@ public class Main {
                     0,
                     lectorCsv,
                     divisiones,
-                    0,
-                    10,
+                    5,
+                    8,
                     clasificacionesColumnas,
                     tarea
             );
@@ -100,7 +102,7 @@ public class Main {
             int[] resultado = evaluarArbol(arbol, arbolDecision.getDatosTest(), lectorCsv.getCabecera());
             double precision = (double) resultado[0] / resultado[1] * 100;
 
-            System.out.println("Generando arbol podado " + i);
+            //System.out.println("Generando arbol podado " + i);
             Object arbolPodado = podaArbol(arbol, arbolDecision.getDatosEntrenamiento(), arbolDecision.getDatosTest(), lectorCsv.getCabecera(), tarea);
 
             //imprimirArbol(arbolPodado, 0);
@@ -109,10 +111,11 @@ public class Main {
             double precisionPoda = (double) resultadoPoda[0] / resultadoPoda[1] * 100;
             //System.out.println("Precisión del árbol original " + i + ": " + precision + "%");
             //System.out.println("Precisión del árbol podado " + i + ": " + precisionPoda + "%");
-
+            precisionGlobal += precisionPoda;
             arbolesGenerados.add(arbolPodado);
+            System.out.println("Precision individual " + precisionPoda);
         }
-
+        System.out.println("Precision Random Forest " + precisionGlobal/arbolesGenerados.size() + "%");
         return arbolesGenerados;
     }
 
