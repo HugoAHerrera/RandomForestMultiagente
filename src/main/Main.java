@@ -15,8 +15,8 @@ public class Main {
 
     public static void main(String[] args) {
         String rutaArchivo = "src/data/winequality-red-categorical.csv";
-        String rutaTest = "src/data/test2.csv";
-        String rutaTrain = "src/data/train2.csv";
+        String rutaTest = "src/data/test.csv";
+        String rutaTrain = "src/data/train.csv";
         String rutaDataSet = "src/data/dataset.csv";
         String rutaTitanic = "src/data/titanic_podas_t.csv";
         String rutaTitanicTrain = "src/data/titanic_podas_train.csv";
@@ -52,23 +52,32 @@ public class Main {
         arbolDecision.cargarDatosTest(lector_test.getContenido());
         */
         LectorFicheros lectorCsv = new LectorFicheros();
-        lectorCsv.leerCSV(rutaTitanic);
+        lectorCsv.leerCSV(rutaDataSet);
 
         LectorFicheros lector2Csv = new LectorFicheros();
-        lector2Csv.leerCSV(rutaTitanicTrain);
+        lector2Csv.leerCSV(rutaTest);
 
         List<String> clasificacionesColumnas = Clasificador.determinarTipoColumna(lectorCsv.getContenido(), lectorCsv.getCabecera());
 
         ArbolDecision arbolDecision = new ArbolDecision(lectorCsv.getContenido().size());
 
-        //arbolDecision.seleccionarFilasAleatorias();
-        //arbolDecision.dividirDataset(lectorCsv.getContenido());
-        arbolDecision.cargarDatosTrain(lector2Csv.getContenido());
-        arbolDecision.cargarDatosTest(lectorCsv.getContenido());
+        arbolDecision.seleccionarFilasAleatorias();
+        arbolDecision.dividirDataset(lectorCsv.getContenido());
+        //arbolDecision.cargarDatosTrain(lector2Csv.getContenido());
+        //arbolDecision.cargarDatosTest(lectorCsv.getContenido());
 
-        Map<String, List<String>> divisiones = SeparadorClases.obtenerPosiblesDivisiones(arbolDecision.getDatosEntrenamiento(), lectorCsv.getCabecera(), clasificacionesColumnas);
+        String tarea = "clasificacion";
 
-        String tarea = "regresion";
+        int numeroColumnasDivisionesPotenciales;
+        int totalColumnas = lectorCsv.getCabecera().length-1;
+        if (tarea.equals("clasificacion")) {
+            numeroColumnasDivisionesPotenciales = (int) Math.max(1, Math.round(Math.sqrt(totalColumnas)));
+        } else {
+            numeroColumnasDivisionesPotenciales = (int) Math.max(1, Math.round(totalColumnas / 3.0));
+        }
+        System.out.println("Número columnas aleatorias " + numeroColumnasDivisionesPotenciales + ", de " + totalColumnas);
+        Map<String, List<String>> divisiones = SeparadorClases.obtenerPosiblesDivisiones(arbolDecision.getDatosEntrenamiento(), lectorCsv.getCabecera(), clasificacionesColumnas, numeroColumnasDivisionesPotenciales);
+
 
         Object arbol = arbolDecision.crearArbolDecision(
                 arbolDecision.getDatosEntrenamiento(),
@@ -82,21 +91,25 @@ public class Main {
                 tarea
         );
 
-        //imprimirArbol(arbol, 0);
+        imprimirArbol(arbol, 0);
 
-        //Esto solo en clasificacion
-        //evaluarArbol(arbol, arbolDecision.getDatosTest(), lectorCsv.getCabecera());
-        /*int[] resultado = evaluarArbol(arbol, arbolDecision.getDatosTest(), lectorCsv.getCabecera());
+        int[] resultado = evaluarArbol(arbol, arbolDecision.getDatosTest(), lectorCsv.getCabecera());
         double precision = (double) resultado[0] / resultado[1] * 100;
-        System.out.println("Precisión del árbol: " + precision + "%");*/
+        System.out.println("Precisión del árbol original: " + precision + "%");
+
+        Object arbolPodado = podaArbol(arbol, arbolDecision.getDatosEntrenamiento(), arbolDecision.getDatosTest(), lectorCsv.getCabecera(), tarea);
+
+        imprimirArbol(arbolPodado, 0);
+
+        int[] resultadoPoda = evaluarArbol(arbolPodado, arbolDecision.getDatosTest(), lectorCsv.getCabecera());
+        double precisionPoda = (double) resultadoPoda[0] / resultadoPoda[1] * 100;
+        System.out.println("Precisión del árbol podado: " + precisionPoda + "%");
 
         //Para regresión
         //mejorProfundidadRegresion(arbolDecision, lectorCsv, divisiones, clasificacionesColumnas);
 
-        Object arbolPodado = podaArbol(arbol, arbolDecision.getDatosEntrenamiento(), arbolDecision.getDatosTest(), lectorCsv.getCabecera(), tarea);
-
-        System.out.println(calcularRCuadrado(arbolDecision.getDatosTest(), arbol, lectorCsv.getCabecera()));
-        System.out.println(calcularRCuadrado(arbolDecision.getDatosTest(), arbolPodado, lectorCsv.getCabecera()));
+        //System.out.println(calcularRCuadrado(arbolDecision.getDatosTest(), arbol, lectorCsv.getCabecera()));
+        //System.out.println(calcularRCuadrado(arbolDecision.getDatosTest(), arbolPodado, lectorCsv.getCabecera()));
     }
 
 

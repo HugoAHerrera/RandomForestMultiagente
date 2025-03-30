@@ -20,6 +20,7 @@ public class ArbolDecision {
         datosTest = new ArrayList<>();
     }
 
+    //Muestreo aleatorio del RandomForest
     public void seleccionarFilasAleatorias() {
         int cantidadFilas = (int) (tamañoMuestra * 0.2); // 20% del total
         Random random = new Random();
@@ -30,6 +31,7 @@ public class ArbolDecision {
         }
     }
 
+    //Muestreo aleatorio del RandomForest
     public void dividirDataset(List<String[]> datos) {
 
         for (int i = 0; i < datos.size(); i++) {
