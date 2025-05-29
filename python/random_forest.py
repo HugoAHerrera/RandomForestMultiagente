@@ -5,7 +5,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.tree import export_text
 from math import log2
 
-df = pd.read_csv("src/data/dataset.csv")
+df = pd.read_csv("src_antiguo/data/dataset.csv")
 X = df[["sepal_length", "sepal_width", "petal_length", "petal_width"]]
 y = df["species"]
 
@@ -47,7 +47,7 @@ for i in range(tree.node_count):
         print(f"Nodo {i}: split por '{feature}' <= {threshold:.2f} | muestras = {samples} | entropía = {entropia:.4f}")
 
 """
-df = pd.read_csv("src/data/winequality-red-categorical.csv")
+df = pd.read_csv("src_antiguo/data/winequality-red-categorical.csv")
 
 X = df[["fixed acidity", "volatile acidity", "citric acid", "residual sugar", "chlorides",
         "free sulfur dioxide", "total sulfur dioxide", "density", "pH", "sulphates", "alcohol"]]
@@ -67,7 +67,7 @@ print(f"Precisión: {precision:.2%}")
 
 
 # 1. Cargar datos
-df = pd.read_csv("src/data/winequality-red-categorical.csv")
+df = pd.read_csv("src_antiguo/data/winequality-red-categorical.csv")
 
 # 2. Separar variables predictoras (X) y variable objetivo (y)
 X = df[["fixed acidity", "volatile acidity", "citric acid", "residual sugar", "chlorides",

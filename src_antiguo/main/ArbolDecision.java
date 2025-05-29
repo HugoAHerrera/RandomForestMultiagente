@@ -1,10 +1,9 @@
-package src.main;
+package src_antiguo.main;
 
 import java.util.*;
-import src.funciones.DatoPuro;
-import src.funciones.Clasificador;
-import src.funciones.SeparadorClases;
-import src.funciones.SeparadorEntropia;
+import src_antiguo.funciones.DatoPuro;
+import src_antiguo.funciones.Clasificador;
+import src_antiguo.funciones.SeparadorEntropia;
 
 public class ArbolDecision {
 

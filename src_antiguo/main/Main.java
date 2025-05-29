@@ -1,9 +1,7 @@
-package src.main;
+package src_antiguo.main;
 
-import src.funciones.DatoPuro;
-import src.funciones.Clasificador;
-import src.funciones.SeparadorClases;
-import src.funciones.SeparadorEntropia;
+import src_antiguo.funciones.Clasificador;
+import src_antiguo.funciones.SeparadorClases;
 
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -16,18 +14,18 @@ public class Main {
     static Double precisionGlobal = 0.0;
 
     public static void main(String[] args) {
-        String rutaArchivo = "src/data/winequality-red-categorical.csv";
-        String rutaTest = "src/data/test.csv";
-        String rutaTrain = "src/data/train.csv";
-        String rutaDataSet = "src/data/dataset.csv";
-        String rutaTitanic = "src/data/titanic_podas_t.csv";
-        String rutaTitanicTrain = "src/data/titanic_podas_train.csv";
+        String rutaArchivo = "src_antiguo/data/winequality-red-categorical.csv";
+        String rutaTest = "src_antiguo/data/test.csv";
+        String rutaTrain = "src_antiguo/data/train.csv";
+        String rutaDataSet = "src_antiguo/data/dataset.csv";
+        String rutaTitanic = "src_antiguo/data/titanic_podas_t.csv";
+        String rutaTitanicTrain = "src_antiguo/data/titanic_podas_train.csv";
 
-        String data2 = "src/data/train_bike.csv";
-        String data3 = "src/data/val_bike.csv";
+        String data2 = "src_antiguo/data/train_bike.csv";
+        String data3 = "src_antiguo/data/val_bike.csv";
 
-        String data4 = "src/data/pruebas_train.csv";
-        String data5 = "src/data/pruebas_val.csv";
+        String data4 = "src_antiguo/data/pruebas_train.csv";
+        String data5 = "src_antiguo/data/pruebas_val.csv";
 
         LectorFicheros lectorCsv = new LectorFicheros();
         lectorCsv.leerCSV(rutaArchivo);
