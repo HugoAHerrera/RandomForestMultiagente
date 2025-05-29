@@ -2,9 +2,7 @@ package com.randomforest;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.csv.*;
 
 import java.io.FileReader;
 import java.io.Reader;
@@ -13,6 +11,7 @@ import java.util.*;
 @Getter
 @Setter
 public class Lector {
+
     private String[] cabecera = {};
     private String ultimoFicheroLeido = "";
     private Clasificador clasificador = new Clasificador();
@@ -29,13 +28,11 @@ public class Lector {
 
         try (Reader in = new FileReader(nombreArchivo)) {
             CSVFormat format = CSVFormat.DEFAULT.builder()
-                    .setHeader() // Primera linea = cabecera
+                    .setHeader()
                     .setSkipHeaderRecord(true)
                     .build();
 
             CSVParser parser = new CSVParser(in, format);
-            Iterable<CSVRecord> records = parser.getRecords();
-
             Map<String, Integer> headerMap = parser.getHeaderMap();
 
             List<String> cabeceraFiltrada = new ArrayList<>();
@@ -44,11 +41,11 @@ public class Lector {
                     cabeceraFiltrada.add(col.trim());
                 }
             }
-            cabecera = cabeceraFiltrada.toArray(new String[0]);
 
+            cabecera = cabeceraFiltrada.toArray(new String[0]);
             clasificador.inicializarColumnas(cabecera);
 
-            for (CSVRecord record : records) {
+            for (CSVRecord record : parser) {
                 String[] filaFiltrada = new String[cabecera.length];
                 for (int i = 0; i < cabecera.length; i++) {
                     filaFiltrada[i] = record.get(cabecera[i]).trim();
@@ -57,7 +54,6 @@ public class Lector {
             }
 
             clasificador.finalizarClasificacion();
-
             ultimoFicheroLeido = nombreArchivo;
             System.out.println("Archivo leído correctamente.");
 
@@ -70,3 +66,4 @@ public class Lector {
         return clasificador.getTiposColumnas();
     }
 }
+

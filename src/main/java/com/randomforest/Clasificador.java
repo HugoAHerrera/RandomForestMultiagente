@@ -23,7 +23,6 @@ public class Clasificador {
         tiposColumnas.clear();
         valoresPorColumna.clear();
         columnasContinuas.clear();
-
         for (String col : cabecera) {
             valoresPorColumna.put(col, new HashSet<>());
         }
@@ -33,10 +32,8 @@ public class Clasificador {
         for (int i = 0; i < fila.length; i++) {
             String col = cabecera[i];
             if (columnasContinuas.contains(col)) continue;
-
             Set<String> valores = valoresPorColumna.get(col);
             valores.add(fila[i]);
-
             if (valores.size() > LIMITE_DISTINTOS) {
                 tiposColumnas.put(col, Tipo.CONTINUA);
                 columnasContinuas.add(col);
@@ -54,3 +51,4 @@ public class Clasificador {
         valoresPorColumna.clear();
     }
 }
+
