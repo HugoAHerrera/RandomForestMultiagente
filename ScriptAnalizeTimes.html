@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pruebas de lectura CSV múltiples</title>
+</head>
+<body>
+  <h2>Seleccioná uno o más CSV grandes</h2>
+  <input type="file" id="csvFiles" accept=".csv" multiple /><br /><br />
+
+  <button onclick="runAll()">Ejecutar todas las opciones para todos los archivos</button>
+
+  <script>
+    const incremento = 512 * 1024; // 512KB
+
+    function formatoBytes(bytes) {
+      const unidades = ['B', 'KB', 'MB', 'GB'];
+      let i = 0;
+      let valor = bytes;
+      while (valor >= 1024 && i < unidades.length - 1) {
+        valor /= 1024;
+        i++;
+      }
+      return `${valor.toFixed(2)} ${unidades[i]}`;
+    }
+
+    // Función para guardar archivo (descarga en navegador)
+    function guardarArchivo(nombre, contenido) {
+      const blob = new Blob([contenido], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = nombre;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    async function opcion1(file) {
+      let chunkSize = 500000; // 500KB
+      const resultados = [];
+      let mejorTiempo = Infinity;
+
+      while (true) {
+        const start = performance.now();
+        const chunkSizeActual = chunkSize;
+
+        let offset = 0;
+        let leftover = '';
+        let count = 0;
+
+        while (offset < file.size) {
+          const slice = file.slice(offset, offset + chunkSizeActual);
+          const text = await slice.text();
+          let lines = (leftover + text).split(/\r?\n/);
+          leftover = lines.pop();
+
+          for (let i = 0; i < lines.length; i++) {
+            count++;
+            if (count % 10000 === 0) {
+              console.log(`Opción 1 archivo ${file.name} chunkSize ${chunkSizeActual} - 🟨 Simulando envío de 10k líneas (total: ${count})`);
+            }
+          }
+
+          offset += chunkSizeActual;
+          console.log(`Opción 1 archivo ${file.name} chunkSize ${chunkSizeActual} - 📦 Procesado hasta byte ${offset}...`);
+          await new Promise(r => setTimeout(r, 0));
+        }
+
+        const end = performance.now();
+        const duracion = end - start;
+        console.log(`Opción 1 archivo ${file.name} chunkSize ${chunkSizeActual} - ✅ Lectura completada en ${duracion.toFixed(2)} ms`);
+
+        resultados.push(`${formatoBytes(chunkSizeActual)}, ${duracion.toFixed(2)} ms`);
+
+        if (duracion < mejorTiempo) {
+          mejorTiempo = duracion;
+        } else if (duracion > mejorTiempo * 2) {
+          break;
+        }
+
+        chunkSize += incremento;
+      }
+
+      guardarArchivo(`${file.size}_${file.name}_opcion1_resultados.txt`, resultados.join('\n'));
+    }
+
+    async function opcion2(file) {
+      const resultados = [];
+      const maxWorkers = 10;
+      const chunkInicial = 500000; // 500KB
+
+      for (let numWorkers = 1; numWorkers <= maxWorkers; numWorkers++) {
+        let chunkSize = chunkInicial;
+        let mejorTiempo = Infinity;
+
+        while (true) {
+          const start = performance.now();
+
+          let offset = 0;
+          let workersDone = 0;
+          const totalChunks = Math.ceil(file.size / chunkSize);
+
+          const workers = [];
+          for (let i = 0; i < numWorkers; i++) {
+            const worker = new Worker(URL.createObjectURL(new Blob([`
+              self.onmessage = function(e) {
+                const text = e.data;
+                // Simulación de procesamiento
+                self.postMessage("done");
+              }
+            `], { type: 'application/javascript' })));
+            workers.push(worker);
+          }
+
+          await new Promise((resolve, reject) => {
+            workers.forEach(worker => {
+              worker.onmessage = () => {
+                workersDone++;
+                if (workersDone === totalChunks) {
+                  resolve();
+                }
+              };
+              worker.onerror = (e) => reject(e);
+            });
+
+            (async () => {
+              while (offset < file.size) {
+                const chunk = file.slice(offset, offset + chunkSize);
+                const text = await chunk.text(); // Leer antes de enviar
+                const currentWorker = workers[(offset / chunkSize) % numWorkers];
+                currentWorker.postMessage(text);
+                offset += chunkSize;
+              }
+            })();
+          });
+
+          const end = performance.now();
+          const duracion = end - start;
+
+          console.log(`Opción 2 archivo ${file.name} chunkSize ${chunkSize} workers ${numWorkers} - ✅ ${duracion.toFixed(2)} ms`);
+
+          resultados.push(`${formatoBytes(chunkSize)}, ${numWorkers} workers, ${duracion.toFixed(2)} ms`);
+
+          if (duracion < mejorTiempo) {
+            mejorTiempo = duracion;
+          } else if (duracion > mejorTiempo * 2) {
+            break;
+          }
+
+          chunkSize += 512 * 1024; // incrementar en 512KB
+        }
+      }
+
+      guardarArchivo(`${file.size}_${file.name}_opcion2_resultados.txt`, resultados.join('\n'));
+    }
+
+    async function opcion3(file) {
+      let chunkSize = 500000; // 500KB
+      const resultados = [];
+      let mejorTiempo = Infinity;
+      const agents = ['http://agent1.com', 'http://agent2.com', 'http://agent3.com'];
+
+      while (true) {
+        const start = performance.now();
+
+        let offset = 0;
+        let leftover = '';
+        let batch = [];
+        let currentAgentIndex = 0;
+        let countLines = 0;
+
+        while (offset < file.size) {
+          const slice = file.slice(offset, offset + chunkSize);
+          const text = await slice.text();
+          let lines = (leftover + text).split(/\r?\n/);
+          leftover = lines.pop();
+
+          for (let i = 0; i < lines.length; i++) {
+            batch.push(lines[i]);
+            countLines++;
+            if (batch.length === 2000) {
+              console.log(`Opción 3 archivo ${file.name} chunkSize ${chunkSize} - 🚀 Enviando 2000 líneas a ${agents[currentAgentIndex]}`);
+              batch = [];
+              currentAgentIndex = (currentAgentIndex + 1) % agents.length;
+            }
+          }
+
+          offset += chunkSize;
+          console.log(`Opción 3 archivo ${file.name} chunkSize ${chunkSize} - 📦 Leído hasta byte ${offset}`);
+          await new Promise(r => setTimeout(r, 0));
+        }
+
+        if (batch.length > 0) {
+          console.log(`Opción 3 archivo ${file.name} chunkSize ${chunkSize} - 🚀 Enviando última batch de ${batch.length} líneas a ${agents[currentAgentIndex]}`);
+        }
+
+        const end = performance.now();
+        const duracion = end - start;
+        console.log(`Opción 3 archivo ${file.name} chunkSize ${chunkSize} - ✅ Completada en ${duracion.toFixed(2)} ms`);
+
+        resultados.push(`${formatoBytes(chunkSize)},${duracion.toFixed(2)}`);
+
+        if (duracion < mejorTiempo) {
+          mejorTiempo = duracion;
+        } else if (duracion > mejorTiempo * 2) {
+          break;
+        }
+
+        chunkSize += incremento;
+      }
+
+      guardarArchivo(`${file.size}_${file.name}_opcion3_resultados.txt`, resultados.join('\n'));
+    }
+
+    async function opcion4(file) {
+      let chunkSize = 500000; // 500KB (se mantiene para consistencia)
+      const resultados = [];
+      let mejorTiempo = Infinity;
+
+      while (true) {
+        const start = performance.now();
+
+        const reader = file.stream().getReader();
+        const decoder = new TextDecoder("utf-8");
+        let leftover = '';
+        let count = 0;
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          let chunk = decoder.decode(value, { stream: true });
+          let lines = (leftover + chunk).split(/\r?\n/);
+          leftover = lines.pop();
+
+          for (let i = 0; i < lines.length; i++) {
+            count++;
+            if (count % 10000 === 0) {
+              console.log(`Opción 4 archivo ${file.name} - 🚀 Simulando envío de 10k líneas (total: ${count})`);
+            }
+          }
+
+          console.log(`Opción 4 archivo ${file.name} chunkSize ${chunkSize} - 📦 Procesado`);
+          await new Promise(r => setTimeout(r, 0));
+        }
+
+        if (leftover) {
+          console.log(`Opción 4 archivo ${file.name} chunkSize ${chunkSize} - 🚀 Enviando última línea`);
+        }
+
+        const end = performance.now();
+        const duracion = end - start;
+        console.log(`Opción 4 archivo ${file.name} chunkSize ${chunkSize} - ✅ Completada en ${duracion.toFixed(2)} ms`);
+
+        resultados.push(`${formatoBytes(chunkSize)},${duracion.toFixed(2)}`);
+
+        if (duracion < mejorTiempo) {
+          mejorTiempo = duracion;
+        } else if (duracion > mejorTiempo * 2) {
+          break;
+        }
+
+        chunkSize += incremento;
+      }
+
+      guardarArchivo(`${file.size}_${file.name}_opcion4_resultados.txt`, resultados.join('\n'));
+    }
+
+    async function runAll() {
+      const files = document.getElementById('csvFiles').files;
+      if (!files.length) {
+        alert('Subí uno o más archivos primero.');
+        return;
+      }
+
+      for (const file of files) {
+        console.clear();
+        console.log(`Ejecutando opción 1 para archivo ${file.name}...`);
+        await opcion1(file);
+
+        console.log(`Ejecutando opción 2 para archivo ${file.name}...`);
+        await opcion2(file);
+
+        console.log(`Ejecutando opción 3 para archivo ${file.name}...`);
+        await opcion3(file);
+
+        console.log(`Ejecutando opción 4 para archivo ${file.name}...`);
+        await opcion4(file);
+      }
+
+      alert('Todas las opciones para todos los archivos finalizadas.');
+    }
+  </script>
+
+</body>
+</html>

@@ -4,7 +4,9 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.tree import export_text
 from math import log2
+import time
 
+"""
 df = pd.read_csv("src_antiguo/data/dataset.csv")
 X = df[["sepal_length", "sepal_width", "petal_length", "petal_width"]]
 y = df["species"]
@@ -45,29 +47,39 @@ for i in range(tree.node_count):
         entropia = -sum((c / total) * log2(c / total) for c in clases if c > 0)
 
         print(f"Nodo {i}: split por '{feature}' <= {threshold:.2f} | muestras = {samples} | entropía = {entropia:.4f}")
-
 """
-df = pd.read_csv("src_antiguo/data/winequality-red-categorical.csv")
+start_time = time.time()
+
+df = pd.read_csv("data/winequality-synthetic.csv")
 
 X = df[["fixed acidity", "volatile acidity", "citric acid", "residual sugar", "chlorides",
         "free sulfur dioxide", "total sulfur dioxide", "density", "pH", "sulphates", "alcohol"]]
 y = df["quality"]
 
-# Entrenamiento (80%) y prueba (20%)
+# Training (80%) y Test (20%)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-numero_arboles = 20
-modelo = RandomForestClassifier(n_estimators=numero_arboles)
-modelo.fit(X_train, y_train)
+number_trees = 20
+model = RandomForestClassifier(n_estimators=number_trees)
+model.fit(X_train, y_train)
 
-y_pred = modelo.predict(X_test)
+y_pred = model.predict(X_test)
 precision = accuracy_score(y_test, y_pred)
-print(f"Precisión: {precision:.2%}")
+print(f"Accuracy: {precision:.2%}")
+
+end_time = time.time()
+elapsed_seconds = end_time - start_time
+hours = int(elapsed_seconds // 3600)
+minutes = int((elapsed_seconds % 3600) // 60)
+seconds = int(elapsed_seconds % 60)
+
+with open("python_time.txt", "w") as f:
+    f.write(f"Execution: {hours}h {minutes}m {seconds}s\n")
 
 
-
+"""
 # 1. Cargar datos
-df = pd.read_csv("src_antiguo/data/winequality-red-categorical.csv")
+df = pd.read_csv("data/winequality-synthetic.csv")
 
 # 2. Separar variables predictoras (X) y variable objetivo (y)
 X = df[["fixed acidity", "volatile acidity", "citric acid", "residual sugar", "chlorides",
@@ -92,10 +104,4 @@ primer_arbol = modelo.estimators_[0]
 texto_arbol = export_text(primer_arbol, feature_names=list(X.columns))
 print("\nÁrbol de decisión #0 (texto):")
 print(texto_arbol)
-
-# 7. Visualizar el primer árbol gráficamente
-plt.figure(figsize=(20, 10))
-plot_tree(primer_arbol, feature_names=X.columns, filled=True, rounded=True, fontsize=10)
-plt.title("Árbol de decisión #0")
-plt.show()
 """

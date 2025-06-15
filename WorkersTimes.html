@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Pruebas de lectura CSV</title>
+</head>
+<body>
+  <h2>Seleccioná un CSV grande</h2>
+  <input type="file" id="csvFile" accept=".csv"><br><br>
+
+  <h3>Pruebas variando número de workers (chunkSize fijo: 500000)</h3>
+  <button onclick="procesarCSV(10, 500000)">10 Worker</button>
+  <button onclick="procesarCSV(20, 500000)">20 Workers</button>
+  <button onclick="procesarCSV(50, 500000)">50 Workers</button>
+  <button onclick="procesarCSV(100, 500000)">100 Workers</button>
+  <button onclick="procesarCSV(200, 500000)">200 Workers</button>
+
+  <h3>Pruebas variando chunkSize (1 worker fijo)</h3>
+  <button onclick="procesarCSV(1, 3000000)">chunkSize: 3000000</button>
+  <button onclick="procesarCSV(1, 5000000)">chunkSize: 5000000</button>
+  <button onclick="procesarCSV(1, 7000000)">chunkSize: 7000000</button>
+  <button onclick="procesarCSV(1, 8000000)">chunkSize: 8000000</button>
+  <button onclick="procesarCSV(1, 10000000)">chunkSize: 10000000</button>
+  <button onclick="procesarCSV(1, 12000000)">chunkSize: 12000000</button>
+  <button onclick="procesarCSV(1, 15000000)">chunkSize: 15000000</button>
+  <button onclick="procesarCSV(1, 20000000)">chunkSize: 20000000</button>
+  <button onclick="procesarCSV(1, 3000000)">chunkSize: 3000000</button>
+  <button onclick="procesarCSV(1, 5000000)">chunkSize: 5000000</button>
+
+  <script>
+    function procesarCSV(numWorkers, chunkSize) {
+      const file = document.getElementById('csvFile').files[0];
+      if (!file) return alert("Subí un archivo primero.");
+
+      const start = performance.now();
+      let offset = 0;
+      let workersDone = 0;
+      const totalChunks = Math.ceil(file.size / chunkSize);
+
+      const workers = [];
+      for (let i = 0; i < numWorkers; i++) {
+        const worker = new Worker(URL.createObjectURL(new Blob([`
+          self.onmessage = function(e) {
+            const text = e.data;
+            const lines = text.split(/\\r?\\n/);
+            console.log("Simulando envío de", lines.length, "líneas desde worker");
+            self.postMessage("done");
+          }
+        `], { type: 'application/javascript' })));
+
+        worker.onmessage = function () {
+          workersDone++;
+          if (workersDone === totalChunks) {
+            const end = performance.now();
+            console.log(`✅ Procesamiento completado con ${numWorkers} worker(s), chunkSize=${chunkSize} en ${(end - start).toFixed(2)} ms`);
+          }
+        };
+
+        workers.push(worker);
+      }
+
+      while (offset < file.size) {
+        const chunk = file.slice(offset, offset + chunkSize);
+        const reader = new FileReader();
+        const currentWorker = workers[(offset / chunkSize) % numWorkers];
+
+        reader.onload = function(e) {
+          currentWorker.postMessage(e.target.result);
+        };
+
+        reader.readAsText(chunk);
+        offset += chunkSize;
+      }
+    }
+  </script>
+</body>
+</html>
