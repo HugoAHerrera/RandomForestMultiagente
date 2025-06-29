@@ -1,0 +1,189 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background-color: #99d5e9;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 80px;
+}
+
+.header-left {
+  font-weight: bold;
+  font-size: 1.5rem;
+  flex: 1;
+}
+
+.header-center {
+  text-align: center;
+  flex: 1;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.header-right {
+  display: flex;
+  justify-content: flex-end;
+  flex: 1;
+}
+
+.header-right button {
+  padding: 10px 16px;
+  cursor: pointer;
+  margin-left: 10px;
+  background-color: #0077b6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.header-right button:hover {
+  background-color: #005f8d;
+}
+
+main {
+  padding: 20px;
+}
+
+#csvInput {
+  font-size: 1rem;
+  padding: 10px 15px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #f8f8f8;
+  cursor: pointer;
+}
+
+#columnPreview {
+  margin: 20px auto 0 auto;
+  overflow-x: auto;
+  max-width: 90%;
+  display: flex;
+  justify-content: left;
+}
+
+#columnPreview table {
+  margin: 0 auto;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 800px;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+select {
+  padding: 4px;
+}
+
+main h2 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+}
+
+#csvControls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+#csvNote {
+  font-size: 1.5rem;
+  color: #333;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 10px;
+}
+
+#samplesDiv {
+  max-width: 90%;
+  margin: 20px auto;
+  padding: 15px;
+  border: 1px solid #ccc;
+  background-color: #f0f4f8;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+#samplesDiv label {
+  font-weight: 600;
+  margin-right: 10px;
+}
+
+#samplesDiv input[type="number"],
+#samplesDiv input[type="text"],
+#samplesDiv select {
+  padding: 6px 8px;
+  margin-right: 15px;
+  width: auto;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.sample-row {
+  margin-top: 10px;
+  border-top: 1px solid #ddd;
+  padding-top: 10px;
+}
+
+.sample-row > div {
+  margin-bottom: 8px;
+}
+
+.sample-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.sample-cell {
+  padding: 10px;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.sample-cell > div {
+  font-weight:bold;
+  padding:4px;
+  border-radius:4px;
+}
+
+.sample-cell label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.sample-cell .sample-value {
+  padding: 6px 8px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  color: #222;
+}
+
+.sample-cell.predicted .sample-value {
+  background-color: #d1e7dd;
+  font-weight: bold;
+  color: #0b3e2e;
+}

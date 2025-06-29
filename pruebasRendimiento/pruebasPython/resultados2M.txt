@@ -1,0 +1,6 @@
+Tiempo de carga: 3602 ms
+Fila 2 millones: ['white', np.float64(6.29), np.float64(0.28), np.float64(0.36), np.float64(5.67), np.float64(0.038), np.float64(56.0), np.float64(122.1), np.float64(0.988584), np.float64(3.17), np.float64(0.6), np.float64(12.064426958632868), np.int64(6)]
+Tiempo acceso fila 2M: 0 ms
+Valores únicos primera columna: 2
+Tiempo valores únicos: 817 ms
+

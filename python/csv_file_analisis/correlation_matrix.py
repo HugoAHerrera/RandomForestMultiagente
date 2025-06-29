@@ -22,17 +22,3 @@ plt.figure(figsize=(12, 10))
 sns.heatmap(mean_corr, annot=True, fmt=".2f", cmap="coolwarm", square=True)
 plt.title("Mean correlation matrix (by chunks)")
 plt.show()
-
-
-"""
-df = pd.read_csv("data/winequality-synthetic-plus.csv")
-
-# Convert wine types into numbers
-df['wine type'] = df['type'].map({'red': 0, 'white': 1}) 
-
-correlation = df.corr(numeric_only=True)
-plt.figure(figsize=(12, 10))
-sns.heatmap(correlation, annot=True, fmt=".2f", cmap="coolwarm", square=True)
-plt.title("Correlation matrix")
-plt.show()
-"""

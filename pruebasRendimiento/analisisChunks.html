@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Benchmark lectura CSV por buffer</title>
+</head>
+<body>
+
+<h2>Benchmark de lectura de CSV por tamaño de buffer</h2>
+<input type="file" id="csvInput" accept=".csv" />
+
+<script>
+document.getElementById('csvInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  let bufferSize = 8 * 1024; // Empieza en 8KB
+  let mejorTiempo = Infinity;
+  let resultados = [];
+
+  while (true) {
+    const reader = file.stream().getReader();
+    const decoder = new TextDecoder();
+    let leftover = "";
+    let totalLines = 0;
+    let bufferCount = 0;
+    let byteCount = 0;
+    let firstLinePrinted = false;
+
+    const start = performance.now();
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      if (!(value instanceof Uint8Array)) continue;
+
+      byteCount += value.length;
+
+      for (let i = 0; i < value.length; i += bufferSize) {
+        const chunk = value.slice(i, i + bufferSize);
+        const text = decoder.decode(chunk, { stream: true });
+        leftover += text;
+
+        const lines = leftover.split(/\r?\n/);
+        leftover = lines.pop();
+
+        let validLines = 0;
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed) continue;
+          if (!firstLinePrinted) {
+            console.log("Primera línea leída:", trimmed);
+            firstLinePrinted = true;
+          }
+          validLines++;
+        }
+
+        totalLines += validLines;
+        bufferCount++;
+      }
+    }
+
+    if (leftover.trim()) {
+      if (!firstLinePrinted) console.log("Primera línea leída:", leftover.trim());
+      totalLines++;
+    }
+
+    const end = performance.now();
+    const tiempo = end - start;
+    const lineasPorBuffer = (totalLines / bufferCount).toFixed(2);
+    const velocidadMB = ((byteCount / 1024 / 1024) / (tiempo / 1000)).toFixed(2);
+
+    console.log(`\nBuffer: ${bufferSize} bytes`);
+    console.log(`Tiempo: ${tiempo.toFixed(2)} ms`);
+    console.log(`Líneas: ${totalLines}`);
+    console.log(`Buffers leídos: ${bufferCount}`);
+    console.log(`Líneas/buffer: ${lineasPorBuffer}`);
+    console.log(`Velocidad: ${velocidadMB} MB/s`);
+
+    resultados.push({
+      bufferSize,
+      tiempo: tiempo.toFixed(2),
+      lineas: totalLines,
+      buffers: bufferCount,
+      lineasPorBuffer,
+      velocidadMB
+    });
+
+    if (tiempo < mejorTiempo) {
+      mejorTiempo = tiempo;
+    } else if (tiempo > mejorTiempo * 1.5) {
+      break;
+    }
+
+    bufferSize *= 2;
+  }
+
+  // Guardar resultados
+  let txt = `Resultados para archivo: ${file.name}\n\n`;
+  resultados.forEach(r => {
+    txt += `Buffer: ${r.bufferSize} bytes\n`;
+    txt += `  Tiempo: ${r.tiempo} ms\n`;
+    txt += `  Líneas: ${r.lineas}\n`;
+    txt += `  Buffers: ${r.buffers}\n`;
+    txt += `  Líneas/buffer: ${r.lineasPorBuffer}\n`;
+    txt += `  Velocidad: ${r.velocidadMB} MB/s\n\n`;
+  });
+
+  const blob = new Blob([txt], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = file.name.replace(/\.[^/.]+$/, "") + "_benchmark_buffer.txt";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+});
+</script>
+
+</body>
+</html>

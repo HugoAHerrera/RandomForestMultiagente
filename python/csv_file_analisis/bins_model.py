@@ -2,7 +2,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-df = pd.read_csv("data/winequality-synthetic.csv")
+df = pd.read_csv("data/winequality-combined.csv")
 
 """
     If quality >= 0 and < 5 --> Bad
@@ -17,7 +17,7 @@ df['quality_range'] = pd.cut(
     bins=bins,
     labels=labels,
     right=False,           
-    include_lowest=True    # Includes 0
+    include_lowest=True
 )
 
 df_bins = df.drop('quality', axis=1)

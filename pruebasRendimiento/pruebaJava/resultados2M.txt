@@ -1,0 +1,13 @@
+=== BufferedReader ===
+Tiempo de carga: 7115 ms
+Fila 2 millones: [white, 7.09, 0.26, 0.3, 2.87, 0.047, 25.6, 128.3, 0.993499, 3.54, 0.53, 10.625320572113864, 4]
+Tiempo acceso fila 2M: 27 ms
+Valores únicos primera columna: 3
+Tiempo valores únicos: 490 ms
+
+=== Apache Commons CSV ===
+Tiempo de carga: 3376 ms
+Fila 2 millones: [white, 6.29, 0.28, 0.36, 5.67, 0.038, 56.0, 122.1, 0.988584, 3.17, 0.6, 12.064426958632867, 6]
+Tiempo acceso fila 2M: 0 ms
+Valores únicos primera columna: 2
+Tiempo valores únicos: 247 ms
