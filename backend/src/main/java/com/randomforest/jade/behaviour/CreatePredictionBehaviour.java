@@ -33,7 +33,7 @@ public class CreatePredictionBehaviour extends CyclicBehaviour {
 
     @Override
     public void action() {
-        MessageTemplate mt = MessageTemplate.MatchConversationId("make-predictions");
+        MessageTemplate mt = MessageTemplate.MatchConversationId("predictions");
         ACLMessage msg = myAgent.receive(mt);
         if (msg != null) {
             PredictionAgent agent = (PredictionAgent) myAgent;

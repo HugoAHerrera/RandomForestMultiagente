@@ -16,8 +16,8 @@ metadata.update_column(column_name='type', sdtype='categorical')
 synthesizer = CTGANSynthesizer(metadata, enforce_rounding=True, epochs=2000, verbose=True)
 synthesizer.fit(df)
 
-chunk_sizes = [2_000_000, 6_000_000, 15_000_000, 30_000_000, 60_000_000]
-base_filename = "data/winequality-synthetic-part"
+chunk_sizes = [10_000, 50_000, 100_000]
+base_filename = "data/winequality-synthetic-"
 
 for i, size in enumerate(chunk_sizes, start=1):
     with open(f"{base_filename}{i}.csv", "w") as f:

@@ -38,7 +38,7 @@ public class SendRowsChunkBehaviour extends CyclicBehaviour {
                 String destName = predictionAgents.get(agent.getCurrentAgent());
                 ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
                 msg.addReceiver(agent.getAID(destName));
-                msg.setConversationId("chunk");
+                msg.setConversationId("rowsChunk");
 
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 ObjectOutputStream oos = new ObjectOutputStream(bos);

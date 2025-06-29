@@ -1,4 +1,0 @@
-1: Compilar
-- javac -cp ../backend/lib/jade.jar {nombreFicheroAgente}.java
-2: Ejecutar
-- java -cp "C:\Program Files (x86)\jade\lib\jade.jar;." jade.Boot -gui -agents "{nombreAgente}:{carpeta}.{nombreFicheroAgente}"

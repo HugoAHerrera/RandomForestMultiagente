@@ -54,8 +54,8 @@ public class PredictionService {
 
             prediction.setFileName(dto.getFileName());
 
-            double porcentaje = Math.round(dto.getAccuracy() * 100.0) / 100.0;
-            prediction.setAccuracy(porcentaje + "%");
+            double roundedAccuracy = Math.round(dto.getAccuracy() * 100.0) / 100.0;
+            prediction.setAccuracy(roundedAccuracy + "%");
 
             predictionRepository.save(prediction);
         }

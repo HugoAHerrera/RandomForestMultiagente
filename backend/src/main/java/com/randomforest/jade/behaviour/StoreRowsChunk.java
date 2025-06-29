@@ -26,7 +26,7 @@ public class StoreRowsChunk extends CyclicBehaviour {
 
     @Override
     public void action() {
-        MessageTemplate template = MessageTemplate.MatchConversationId("chunk");
+        MessageTemplate template = MessageTemplate.MatchConversationId("rowsChunk");
         ACLMessage msg = myAgent.receive(template);
 
         if (msg != null && msg.getPerformative() == ACLMessage.INFORM) {

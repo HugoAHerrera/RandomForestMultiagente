@@ -43,7 +43,7 @@ public class RequestPredictionsBehaviour extends CyclicBehaviour {
 
                 if (!agent.getPredictionAgents().isEmpty()) {
                     ACLMessage requestMsg = new ACLMessage(ACLMessage.REQUEST);
-                    requestMsg.setConversationId("make-predictions");
+                    requestMsg.setConversationId("predictions");
                     ArrayList<PredictionRequestDto> serializableList = new ArrayList<>(dtoList);
                     try {
                         requestMsg.setContentObject(serializableList);
@@ -61,7 +61,7 @@ public class RequestPredictionsBehaviour extends CyclicBehaviour {
 
                     for (int i = 0; i < agent.getPredictionAgents().size(); i++) {
                         MessageTemplate mtAgree = MessageTemplate.and(
-                            MessageTemplate.MatchConversationId("make-predictions"),
+                            MessageTemplate.MatchConversationId("predictions"),
                             MessageTemplate.MatchPerformative(ACLMessage.AGREE)
                         );
                         ACLMessage agreeReply = myAgent.blockingReceive(mtAgree);
@@ -75,7 +75,7 @@ public class RequestPredictionsBehaviour extends CyclicBehaviour {
 
                     while (responsesReceived < expectedAnswers) {
                         MessageTemplate mtResponse = MessageTemplate.and(
-                            MessageTemplate.MatchConversationId("make-predictions"),
+                            MessageTemplate.MatchConversationId("predictions"),
                             MessageTemplate.or(
                                 MessageTemplate.MatchPerformative(ACLMessage.INFORM),
                                 MessageTemplate.MatchPerformative(ACLMessage.FAILURE)
