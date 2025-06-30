@@ -10,7 +10,6 @@ import com.randomforest.jade.behaviour.StoreRowsChunk;
 import com.randomforest.jade.behaviour.CreatePredictionBehaviour;
 
 import com.randomforest.dto.HeaderDto;
-import com.randomforest.randomforest.Tree;
 import com.randomforest.randomforest.DecisionTree;
 
 import org.apache.commons.csv.CSVPrinter;
@@ -32,7 +31,6 @@ public class PredictionAgent extends BaseAgent {
     private ByteArrayOutputStream csvBuffer;
     private int csvRowCount = 0;
     private int amountTrees;
-    private Tree tree = new Tree();
     private DecisionTree decisionTree;
     private List<List<Object>> trainingData;
 
