@@ -39,10 +39,10 @@ public class CreatePredictionBehaviour extends CyclicBehaviour {
             PredictionAgent agent = (PredictionAgent) myAgent;
 
             if (agent.getHeader() == null || agent.getCsvBuffer() == null) {
-                ACLMessage agreeMsg = msg.createReply();
-                agreeMsg.setPerformative(ACLMessage.REFUSE);
-                agreeMsg.setContent("Refused");
-                myAgent.send(agreeMsg);
+                ACLMessage refuseMsg = msg.createReply();
+                refuseMsg.setPerformative(ACLMessage.REFUSE);
+                refuseMsg.setContent("Refused");
+                myAgent.send(refuseMsg);
             } else {
                 ACLMessage agreeMsg = msg.createReply();
                 agreeMsg.setPerformative(ACLMessage.AGREE);

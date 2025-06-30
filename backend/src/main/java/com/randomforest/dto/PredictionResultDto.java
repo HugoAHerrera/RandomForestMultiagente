@@ -16,17 +16,4 @@ public class PredictionResultDto {
     private Map<String, String> features;
     private String fileName;
     private double accuracy;
-
-    @Override
-    public String toString() {
-        return "PredictionResultDto{" +
-            "userName='" + userName + '\'' +
-            ", target=" + target +
-            ", task='" + task + '\'' +
-            ", features=" + features +
-            ", fileName='" + fileName + '\'' +
-            ", accuracy=" + accuracy +
-            '}';
-    }
-
 }

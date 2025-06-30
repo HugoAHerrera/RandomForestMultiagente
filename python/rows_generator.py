@@ -5,8 +5,6 @@ from sdv.single_table import CTGANSynthesizer
 
 df = pd.read_csv("data/winequality-combined.csv")
 
-print("Nulos por columna:\n", df.isnull().sum())
-
 df.dropna(inplace=True)
 
 metadata = SingleTableMetadata()

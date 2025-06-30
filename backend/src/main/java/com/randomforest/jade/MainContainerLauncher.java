@@ -52,7 +52,7 @@ public class MainContainerLauncher {
             orchestrator.start();
             agentCommunicationService.setOrchestrator(orchestrator);
 
-            int agentAmount = 1;
+            int agentAmount = 3;
             
             List<String> predictionAgents = new ArrayList<>();
 
