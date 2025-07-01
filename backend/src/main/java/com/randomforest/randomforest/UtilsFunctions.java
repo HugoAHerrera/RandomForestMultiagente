@@ -112,10 +112,4 @@ public class UtilsFunctions {
         result.add(dataAbove);
         return result;
     }
-
-
-    public static List<Object> getUniqueValues(List<Object> data) {
-        Set<Object> uniqueSet = new LinkedHashSet<>(data);
-        return new ArrayList<>(uniqueSet);
-    }
 }

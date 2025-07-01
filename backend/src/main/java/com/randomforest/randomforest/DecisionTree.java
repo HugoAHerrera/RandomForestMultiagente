@@ -40,7 +40,7 @@ public class DecisionTree {
         setTrainingColumns();
     }
 
-    public void setTrainingColumns(){
+    private void setTrainingColumns(){
         List<String> candidateAttributes = Bootstrapping.getCandidateAttributes(datasetHeader, targetColumn);
 
         this.trainingColumns = UtilsFunctions.getClassificationColumns(candidateAttributes);
@@ -57,7 +57,7 @@ public class DecisionTree {
         return pruneTree(rootNode, trainingDataset);
     }
 
-    public Node generateTreeRecursive(List<List<Object>> data, int treeDepth) {
+    private Node generateTreeRecursive(List<List<Object>> data, int treeDepth) {
 
         // Base case
         if (data.size() <= minSamplesData || treeMaxDepth == treeDepth || UtilsFunctions.isDataPure(data,targetColumnIndex)) {
@@ -112,7 +112,7 @@ public class DecisionTree {
         return -1;
     }
 
-    public List<Object> getColumn(List<List<Object>> data, int columnIndex) {
+    private List<Object> getColumn(List<List<Object>> data, int columnIndex) {
         List<Object> values = new ArrayList<>();
 
         for (List<Object> row : data) {
@@ -124,7 +124,7 @@ public class DecisionTree {
         return values;
     }
 
-    public List<Object> getSortedColumn(List<List<Object>> data, int columnIndex) {
+    private List<Object> getSortedColumn(List<List<Object>> data, int columnIndex) {
         List<Object> values = getColumn(data, columnIndex);
 
         boolean allStrings = values.stream().allMatch(val -> val instanceof String);
@@ -142,7 +142,7 @@ public class DecisionTree {
     }
 
 
-    public List<List<Object>> getPotencialSplits(List<List<Object>> dataset, List<String> trainingColumns) {
+    private List<List<Object>> getPotencialSplits(List<List<Object>> dataset, List<String> trainingColumns) {
         List<List<Object>> potencialSplits = new ArrayList<>();
 
         for (String columnName : trainingColumns) {
@@ -178,7 +178,7 @@ public class DecisionTree {
         return potencialSplits;
     }
 
-    public SplitResult getBestSplit(List<String> trainingColumns, List<List<Object>> potencialSplits, int targetColumnIndex, List<List<Object>> data) {
+    private SplitResult getBestSplit(List<String> trainingColumns, List<List<Object>> potencialSplits, int targetColumnIndex, List<List<Object>> data) {
         double lowesMetricValue = Double.MAX_VALUE;
         String bestAttribute = null;
         Object bestSplitValue = Double.NaN;
@@ -321,7 +321,7 @@ public class DecisionTree {
         }
     }
 
-    public String getAccuracyOnDataset(Node rootNode, List<List<Object>> evaluationDataset) {
+    private String getAccuracyOnDataset(Node rootNode, List<List<Object>> evaluationDataset) {
         List<PredictionRequestDto> samples = new ArrayList<>();
         List<Double> actuals = new ArrayList<>();
         List<Double> predictions = new ArrayList<>();
@@ -387,7 +387,7 @@ public class DecisionTree {
         }
     }
 
-    public Node pruneTree(Node node, List<List<Object>> testDataset) {
+    private Node pruneTree(Node node, List<List<Object>> testDataset) {
         if (node.isLeaf()) {
             return node;
         }
