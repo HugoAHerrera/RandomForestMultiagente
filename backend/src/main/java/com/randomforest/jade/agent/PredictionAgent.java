@@ -31,8 +31,6 @@ public class PredictionAgent extends BaseAgent {
     private ByteArrayOutputStream csvBuffer;
     private int csvRowCount = 0;
     private int amountTrees;
-    private DecisionTree decisionTree;
-    private List<List<Object>> trainingData;
 
     public void incrementCsvRowCount() {
         this.csvRowCount++;

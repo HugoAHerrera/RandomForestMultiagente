@@ -22,9 +22,9 @@ public class UserController {
 
     @CrossOrigin(origins = "*")
     @PostMapping("/user/register")
-    public ResponseEntity<?> register(@RequestBody Map<String, String> payload) {
-        String username = payload.get("username");
-        String password = payload.get("password");
+    public ResponseEntity<?> register(@RequestBody Map<String, String> params) {
+        String username = params.get("username");
+        String password = params.get("password");
 
         if(userService.usernameExists(username)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", "Usuario ya existe"));
@@ -36,9 +36,9 @@ public class UserController {
 
     @CrossOrigin(origins = "*")
     @PostMapping("/user/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> payload) {
-        String username = payload.get("username");
-        String password = payload.get("password");
+    public ResponseEntity<?> login(@RequestBody Map<String, String> params) {
+        String username = params.get("username");
+        String password = params.get("password");
 
         if(userService.validateUser(username, password)) {
             return ResponseEntity.ok().build();

@@ -50,7 +50,7 @@ public class CreatePredictionBehaviour extends CyclicBehaviour {
                 myAgent.send(agreeMsg);
             }
                
-            List<List<Object>> trainingData = new ArrayList<>();
+            List<List<Object>> dataset = new ArrayList<>();
             try {
                 InputStreamReader isr = new InputStreamReader(
                         new ByteArrayInputStream(agent.getCsvBuffer().toByteArray()),
@@ -74,7 +74,7 @@ public class CreatePredictionBehaviour extends CyclicBehaviour {
                             row.add(rawValue);
                         }
                     }
-                    trainingData.add(row);
+                    dataset.add(row);
                 }
                 parser.close();
             } catch (Exception e) {
@@ -114,14 +114,14 @@ public class CreatePredictionBehaviour extends CyclicBehaviour {
                     }
 
                     for(int i = 0; i<agent.getAmountTrees(); i++){
-                        agent.setDecisionTree(new DecisionTree(taskType, agent.getCsvRowCount(), agent.getHeader(), trainingData, targetColumn));
-                        Node node = agent.getDecisionTree().generateDecisionTree();
-                        String accuracyStr = agent.getDecisionTree().getAccuracy(node);
-                        String clean = accuracyStr.replace(",", ".").replaceAll("[^\\d.\\-]", "");
-                        double val = Double.parseDouble(clean);
-                        accuracies.add(val);
+                        DecisionTree decisionTree = new DecisionTree(taskType, agent.getCsvRowCount(), agent.getHeader(), dataset, targetColumn);
+                        Node node = decisionTree.generateDecisionTree();
+                        String accuracyStr = decisionTree.getAccuracy(node);
+                        String cleanedAcc = accuracyStr.replace(",", ".").replaceAll("[^\\d.\\-]", "");
+                        double accValue = Double.parseDouble(cleanedAcc);
+                        accuracies.add(accValue);
 
-                        List<String> predictions = agent.getDecisionTree().predictSamples(dtoList, node);
+                        List<String> predictions = decisionTree.predictSamples(dtoList, node);
 
                         for (int j = 0; j < dtoList.size(); j++) {
                             String name = dtoList.get(j).getName();
