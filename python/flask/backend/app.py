@@ -99,8 +99,8 @@ def make_predictions():
             accuracy = accuracy_score(y, y_pred)
             print(f"Precisión para {name}: {accuracy:.2f}")
 
-            tree_rules = export_text(model.estimators_[0], feature_names=list(features.keys()))
-            print(f"Árbol de decisión:\n{tree_rules}")
+            #tree_rules = export_text(model.estimators_[0], feature_names=list(features.keys()))
+            #print(f"Árbol de decisión:\n{tree_rules}")
 
         else:
             y = np.array(target_data, dtype=float)
@@ -122,8 +122,8 @@ def make_predictions():
             r2 = model.score(X, y)
             print(f"R^2 para {name}: {r2:.3f}")
 
-            tree_rules = export_text(model.estimators_[0], feature_names=list(features.keys()))
-            print(f"Árbol de decisión:\n{tree_rules}")
+            #tree_rules = export_text(model.estimators_[0], feature_names=list(features.keys()))
+            #print(f"Árbol de decisión:\n{tree_rules}")
 
         print(f"Predicción para {name}: {pred}")
 

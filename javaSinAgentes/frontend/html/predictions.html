@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Predictions</title>
+  <link rel="stylesheet" href="../css/predictions.css" />
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="../js/predictions.js" defer></script>
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+</head>
+<body>
+  <header>
+    <div class="header-left">Random Forest Multiagente</div>
+    <div class="header-center">Bienvenido, <span id="userName"></span></div>
+    <div class="header-right">
+      <button id="historyBtn">Historial</button>
+      <button id="logoutBtn">Salir</button>
+    </div>
+  </header>
+  <main>
+    <h2 id="welcomeTitle">Carga un fichero CSV para continuar</h2>
+    <div id="csvControls">
+      <span id="csvNote" style="display: none;">Selecciona las casillas de las columnas a usar en el algoritmo</span>
+      <input type="file" id="csvInput" accept=".csv" />
+    </div>
+    <div id="columnPreview"></div>
+    <div id="samplesDiv" style="display:none;"></div>
+  </main>
+</body>
+</html>

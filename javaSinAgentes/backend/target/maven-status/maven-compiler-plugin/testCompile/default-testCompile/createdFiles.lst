@@ -1,0 +1,7 @@
+com\randomforest\randomforest\BootstrappingTest.class
+com\randomforest\randomforest\MetricTest.class
+com\randomforest\randomforest\SampleResultsTest.class
+com\randomforest\randomforest\UtilsFunctionsTest.class
+com\randomforest\randomforest\DecisionTreeTest.class
+com\randomforest\randomforest\NodeTest.class
+com\randomforest\randomforest\SplitResultTest.class
