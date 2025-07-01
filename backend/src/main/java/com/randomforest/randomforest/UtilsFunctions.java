@@ -1,8 +1,24 @@
 package com.randomforest.randomforest;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class UtilsFunctions {
+    /**
+     * Creates a final leaf node.
+     * In regression tasks, it returns the mean value of the given dataset.
+     * In classification tasks, it returns the most frequent class.
+     *
+     * @param data dataset
+     * @param columnIndex target column index
+     * @param taskType "regresion" or "clasificacion"
+     * @return leaf
+     */
     public static Object createLeaf(List<List<Object>> data, int columnIndex, String taskType) {
         List<Object> columnValues = new ArrayList<>();
 
@@ -44,7 +60,13 @@ public class UtilsFunctions {
         }
     }
 
-
+    /**
+     * Returns column values frecuencies.
+     *
+     * @param data dataset
+     * @return A map where keys are unique values from the column and values are their frequencies
+     * For example: {A=3, B=2, C=1} 
+     */
     public static Map<Object, Integer> getClassFrequencies(List<Object> data) {
         Map<Object, Integer> frequencyValues = new HashMap<>();
 
@@ -57,6 +79,13 @@ public class UtilsFunctions {
         return frequencyValues;
     }
 
+    /**
+     * Returns whether a dataset is pure based on a specific column.
+     *
+     * @param data The dataset to evaluate.
+     * @param columnIndex The index of the column to check for purity
+     * @return True if there is only one unique value in the column. False if there are multiple
+     */
     public static boolean isDataPure(List<List<Object>> data, int columnIndex) {
         Set<Object> types = new HashSet<>();
 
@@ -74,6 +103,12 @@ public class UtilsFunctions {
         return true;
     }
 
+    /**
+     * Returns the columns to be used in decision tree classification.
+     *
+     * @param columnNames List of all potential columns for building the decision tree
+     * @return List of selected columns
+     */
     public static List<String> getClassificationColumns(List<String> columnNames) {
         List<String> selectedColumns = new ArrayList<>(columnNames);
         int numberColumns = (int) Math.round(Math.sqrt(columnNames.size()));
@@ -82,6 +117,14 @@ public class UtilsFunctions {
         return selectedColumns.subList(0, Math.min(numberColumns, selectedColumns.size()));
     }
 
+    /**
+     * Splits the data into two datasets based on a given criterion.
+     *
+     * @param data dataset before the split
+     * @param columnIndex Column index used for splitting
+     * @param splitValue Value of the column to split the data. Can be a number of a string
+     * @return Two datasets, one surpass the split value >= for numbers and == for string.
+     */
     public static List<List<List<Object>>> splitDataset(List<List<Object>> data, int columnIndex, Object splitValue) {
         List<List<Object>> dataBelow = new ArrayList<>();
         List<List<Object>> dataAbove = new ArrayList<>();

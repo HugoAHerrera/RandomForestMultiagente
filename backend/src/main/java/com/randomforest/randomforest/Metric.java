@@ -6,6 +6,12 @@ import java.util.Map;
 import com.randomforest.randomforest.UtilsFunctions;
 
 public class Metric {
+    /**
+     * Calculates the entropy of a dataset.
+     *
+     * @param data List of the target column values of the dataset
+     * @return The entropy value as a double
+     */
     public static double calculateEntropy(List<Object> data) {
         Map<Object, Integer> classification = UtilsFunctions.getClassFrequencies(data);
 
@@ -20,6 +26,12 @@ public class Metric {
         return entropy;
     }
 
+    /**
+     * Calculates the MSE.
+     *
+     * @param data List of the target column values of the dataset
+     * @return The MSE value as a double
+     */
     public static double calculateMSE(List<Object> data) {
         double sum = 0.0;
         double mean;
@@ -41,6 +53,15 @@ public class Metric {
         return sum / values.size();
     }
 
+    /**
+     * Calculates the average metric value of an already splitted dataset.
+     *
+     * @param datasetBelow dataset with values that meet the split criteria
+     * @param datasetAbove dataset with values that did not meet the split criteria
+     * @param targetColumnIndex target column index
+     * @param function String that specifies if is a regression task or classification task
+     * @return The average metric value of the splitted dataset
+     */
     public static double getAverageMetric(List<List<Object>> datasetBelow, List<List<Object>> datasetAbove, int targetColumnIndex, String function) {
         int totalSamples = datasetBelow.size() + datasetAbove.size();
         double probabilityBelow = (double) datasetBelow.size() / totalSamples;

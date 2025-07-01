@@ -14,19 +14,70 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DecisionTree {
+    /**
+     * String to store the prediction task: "regresion" or "clasificacion"
+     */
     private String taskType;
+
+    /**
+     * Number of rows the dataset has, to create a training dataset with the same amount
+     */
     private int rowsCount;
+
+    /**
+     * Dataset column names and type. {"columnName": "Continua" or "Categorica"}
+     */
     private HeaderDto datasetHeader;
+
+    /**
+     * Dataset
+     */
     private List<List<Object>> dataset;
+
+    /**
+     * Training dataset to generate de decision tree
+     */
     private List<List<Object>> trainingDataset;
+
+    /**
+     * Columns/Attributres/Features from the original dataset used
+     */
     private List<String> trainingColumns;
+
+    /**
+     * Dataset to evaluate the model
+     */
     private List<List<Object>> testDataset;
+
+    /**
+     * Column to predict the value
+     */
     private String targetColumn;
-    private int[] trainingDataIndexArray;
+
+    /**
+     * Position of the target column in the dataset
+     */
     private int targetColumnIndex;
+
+    /**
+     * Depth allowed in the decision tree
+     */
     private int treeMaxDepth = Integer.MAX_VALUE;
+
+    /**
+     * Minimum of samples that a dataset needs to consider creating a Node
+     */
     private int minSamplesData = 1;
 
+    /**
+     * Constructor for the DecisionTree class
+     *
+     * @param taskType the type of task "regresion" or "clasificacion"
+     * @param csvRowsCount the number of rows the dataset has
+     * @param fileHeader the dataset header metadata information. {"columnName": "Continua" or "Categorica"}
+     * @param dataset dataset
+     * @param targetColumn the name of the target column for prediction
+     */
     public DecisionTree(String taskType, int csvRowsCount, HeaderDto fileHeader, List<List<Object>> dataset, String targetColumn) {
         this.taskType = taskType;
         this.rowsCount = csvRowsCount;
@@ -40,12 +91,20 @@ public class DecisionTree {
         setTrainingColumns();
     }
 
+    /**
+     * Set the training columns from all the columns of the original dataset
+     */
     private void setTrainingColumns(){
         List<String> candidateAttributes = Bootstrapping.getCandidateAttributes(datasetHeader, targetColumn);
 
         this.trainingColumns = UtilsFunctions.getClassificationColumns(candidateAttributes);
     }
 
+    /**
+     * Method to create the decision tree
+     * 
+     * @return the root Node of the decision tree 
+     */
     public Node generateDecisionTree() {
         if (trainingDataset.size() <= minSamplesData) {
             List<Object> targetColumnSorted = getSortedColumn(trainingDataset, targetColumnIndex);
@@ -57,6 +116,12 @@ public class DecisionTree {
         return pruneTree(rootNode, trainingDataset);
     }
 
+    /**
+     * Method to create a branch or a Node of the decision tree
+     * 
+     * @param data dataset of that branch or Node
+     * @param treeDepth current depth of the tree
+     */
     private Node generateTreeRecursive(List<List<Object>> data, int treeDepth) {
 
         // Base case
@@ -74,14 +139,17 @@ public class DecisionTree {
         Object leftClass = UtilsFunctions.createLeaf(leftData, targetColumnIndex, taskType);
         Object rightClass = UtilsFunctions.createLeaf(rightData, targetColumnIndex, taskType);
 
+        // If a branch has empty nodes, a leaf is created
         if (leftData.isEmpty() || rightData.isEmpty()) {
             return new Node(UtilsFunctions.createLeaf(data, targetColumnIndex, taskType));
         }
 
+        // Remove duplicated nodes if they are the same
         if (leftClass != null && leftClass.equals(rightClass)) {
             return new Node(leftClass);
         }
 
+        // Avoid getting a null node
         if (leftClass == null || (leftClass instanceof Double && Double.isNaN((Double) leftClass))
                 || rightClass == null || (rightClass instanceof Double && Double.isNaN((Double) rightClass))) {
             return new Node(UtilsFunctions.createLeaf(data, targetColumnIndex, taskType));
@@ -101,6 +169,12 @@ public class DecisionTree {
 
     }
 
+    /**
+     * Gets the index of a column given a column name.
+     *
+     * @param attribute name of the attribute/column
+     * @return index of the column in datasetHeader, -1 if not found
+     */
     private int getAttributeIndex(String attribute) {
         int index = 0;
         for (String column : datasetHeader.getTypes().keySet()) {
@@ -112,6 +186,13 @@ public class DecisionTree {
         return -1;
     }
 
+    /**
+     * Gets all values from a specific column in the dataset.
+     *
+     * @param data dataset as a list of rows
+     * @param columnIndex index of the column to extract
+     * @return list of values from the specified column
+     */
     private List<Object> getColumn(List<List<Object>> data, int columnIndex) {
         List<Object> values = new ArrayList<>();
 
@@ -124,6 +205,13 @@ public class DecisionTree {
         return values;
     }
 
+    /**
+     * Gets and sorts the values of a specific column from the dataset.
+     *
+     * @param data dataset
+     * @param columnIndex index of the column to ort
+     * @return sorted list of values from the column
+     */
     private List<Object> getSortedColumn(List<List<Object>> data, int columnIndex) {
         List<Object> values = getColumn(data, columnIndex);
 
@@ -141,7 +229,13 @@ public class DecisionTree {
         return values;
     }
 
-
+    /**
+     * Gets all the potential split values for each attribute/column in the training columns.
+     *
+     * @param dataset dataset
+     * @param trainingColumns list of attribute names to consider for splits
+     * @return a list of lists containing potential splits values for each attribute
+     */
     private List<List<Object>> getPotencialSplits(List<List<Object>> dataset, List<String> trainingColumns) {
         List<List<Object>> potencialSplits = new ArrayList<>();
 
@@ -178,6 +272,15 @@ public class DecisionTree {
         return potencialSplits;
     }
 
+    /**
+     * Gets the best split among potential splits based on a metric value.
+     *
+     * @param trainingColumns list of attribute names to consider for splitting
+     * @param potencialSplits list of potential splits
+     * @param targetColumnIndex index of the target column
+     * @param data dataset
+     * @return a SplitResult object containing the best attribute, split value, and the resulting left and right datasets
+     */
     private SplitResult getBestSplit(List<String> trainingColumns, List<List<Object>> potencialSplits, int targetColumnIndex, List<List<Object>> data) {
         double lowesMetricValue = Double.MAX_VALUE;
         String bestAttribute = null;
@@ -217,6 +320,13 @@ public class DecisionTree {
         return new SplitResult(bestAttribute, bestSplitValue, bestLeft, bestRight);
     }
 
+    /**
+     * Navigates the decision tree from the root node to a leaf.
+     * 
+     * @param samplesToPredict list of samples to predict the same column/attribute
+     * @param rootNode decision tree root node, where navigation starts
+     * @return list of prediction results
+     */
     public List<String> predictSamples(List<PredictionRequestDto> samplesToPredict, Node rootNode) {
         List<String> predictions = new ArrayList<>();
 
@@ -256,79 +366,32 @@ public class DecisionTree {
         return predictions;
     }
 
+    /**
+     * Get the accuracy of a decision tree using the testing dataset
+     * 
+     * @param rootNode decision tree root node
+     * @return accuracy value as string
+     */
     public String getAccuracy(Node rootNode) {
-        List<PredictionRequestDto> samples = new ArrayList<>();
-        List<Double> actuals = new ArrayList<>();
-        List<Double> predictions = new ArrayList<>();
-
-        for (List<Object> row : testDataset) {
-            Map<String, String> features = new HashMap<>();
-            List<String> columnList = new ArrayList<>(datasetHeader.getTypes().keySet());
-            for (int i = 0; i < columnList.size(); i++) {
-                String column = columnList.get(i);
-                if (!column.equals(targetColumn) && i < row.size()) {
-                    features.put(column, row.get(i).toString());
-                }
-            }
-
-            PredictionRequestDto dto = new PredictionRequestDto();
-            dto.setFeatures(features);
-            dto.setTarget(targetColumn);
-            samples.add(dto);
-
-            Object actualValue = row.get(targetColumnIndex);
-            if (taskType.equalsIgnoreCase("regresion") && actualValue instanceof Number) {
-                actuals.add(((Number) actualValue).doubleValue());
-            }
-        }
-        List<String> predictionsString = predictSamples(samples, rootNode);
-
-        if (taskType.equalsIgnoreCase("regresion")) {
-            for (String pred : predictionsString) {
-                try {
-                    predictions.add(Double.parseDouble(pred));
-                } catch (NumberFormatException e) {
-                    predictions.add(0.0);
-                }
-            }
-
-            double mean = actuals.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
-
-            double sumTotalErrors = 0.0;
-            double sumErrors = 0.0;
-
-            for (int i = 0; i < actuals.size(); i++) {
-                double y = actuals.get(i);
-                double yPred = predictions.get(i);
-                sumTotalErrors += Math.pow(y - mean, 2);
-                sumErrors += Math.pow(y - yPred, 2);
-            }
-
-            double rSquared = (sumTotalErrors == 0) ? 1.0 : 1 - (sumErrors / sumTotalErrors);
-            return String.format("%.2f%%", rSquared * 100);
-        } else {
-            int correct = 0;
-            for (int i = 0; i < predictionsString.size(); i++) {
-                String actual = testDataset.get(i).get(targetColumnIndex).toString();
-                String predicted = predictionsString.get(i);
-                if (predicted.equals(actual)) {
-                    correct++;
-                }
-            }
-
-            double accuracy = (double) correct / testDataset.size() * 100;
-            return String.format("%.2f%%", accuracy);
-        }
+        return getAccuracyOnDataset(rootNode, testDataset);
     }
 
+    /**
+     * Given a decision tree and evaluation dataset it gives the decision tree accuracy
+     * 
+     * @param rootNode decision tree root node
+     * @param evaluationDataset testing dataset
+     * @return accuracy value as string
+     */
     private String getAccuracyOnDataset(Node rootNode, List<List<Object>> evaluationDataset) {
         List<PredictionRequestDto> samples = new ArrayList<>();
         List<Double> actuals = new ArrayList<>();
         List<Double> predictions = new ArrayList<>();
 
+        List<String> columnList = new ArrayList<>(datasetHeader.getTypes().keySet());
+
         for (List<Object> row : evaluationDataset) {
             Map<String, String> features = new HashMap<>();
-            List<String> columnList = new ArrayList<>(datasetHeader.getTypes().keySet());
             for (int i = 0; i < columnList.size(); i++) {
                 String column = columnList.get(i);
                 if (!column.equals(targetColumn) && i < row.size()) {
@@ -387,6 +450,13 @@ public class DecisionTree {
         }
     }
 
+    /**
+     * Given a decision tree and an evaluation dataset, returns a pruned decision tree.
+     * 
+     * @param rootNode decision tree root node
+     * @param evaluationDataset testing dataset
+     * @return Decision tree with inefficient branches pruned
+     */
     private Node pruneTree(Node node, List<List<Object>> testDataset) {
         if (node.isLeaf()) {
             return node;
@@ -438,6 +508,7 @@ public class DecisionTree {
         String accTreeStr = getAccuracyOnDataset(node, testDataset);
         String accLeafStr = getAccuracyOnDataset(prunedLeaf, testDataset);
 
+        //Remove all characters that are not numbers
         double accTree = Double.parseDouble(accTreeStr.replaceAll("[^\\d.\\-]", ""));
         double accLeaf = Double.parseDouble(accLeafStr.replaceAll("[^\\d.\\-]", ""));
 

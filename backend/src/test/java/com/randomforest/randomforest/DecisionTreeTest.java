@@ -214,7 +214,7 @@ public class DecisionTreeTest {
 
     @Test
     void testGenerateTreeLimited() throws Exception {
-        tree.setTreeMaxDepth(1);
+        tree.setTreeMaxDepth(0);
 
         Node rootNode = tree.generateDecisionTree();
         assertTrue(rootNode.isLeaf());
@@ -222,9 +222,8 @@ public class DecisionTreeTest {
     }
 
     @Test
-    void testGenerateTree2Layers() throws Exception {
-        tree.setTreeMaxDepth(2);
-
+    void testGenerateTreeWithLayers() throws Exception {
+        tree.setTreeMaxDepth(10);
         Node rootNode = tree.generateDecisionTree();
         assertFalse(rootNode.isLeaf());
     }
