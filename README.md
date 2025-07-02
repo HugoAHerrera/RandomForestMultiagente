@@ -51,8 +51,9 @@ Este repositorio contiene todo el código generado para desarrollar el sistema j
 │   └── pruebasPython: carpeta con los resultados y código para analizar el tiempo de Pandas  
 ├── python  
 │   ├── flask: applicación en flask con backend y frontend, el equivalente de javaSinAgentes  
-│   └── rows_generator.py: fichero para generar datasets por medio de un CSV de entrenamiento y SDV  
-└── .docker-compose.yml: archivo YAML para configurar los contenedores de la carpeta backend y frontend  
+│   └── rows_generator.py: fichero para generar datasets por medio de un CSV de entrenamiento y SDV 
+├── docker-compose.yml: archivo YAML para configurar los contenedores de la carpeta backend y frontend  
+└── readmeImagenes: imagenes mostradas en el readme
 ```
 
 ## Requisitos
@@ -90,9 +91,9 @@ docker-compose up --build
 ```
 Este proceso lleva unos minutos, esperar hasta ver por la pantalla: "Started RandomForestApplication in X.X seconds".  
 6. Acceder a la aplicación: Buscar en el navegador "localhost".  
-7. Pulsar en el botón "Registrar" y crear un usuario. (Poner foto)  
-8. Una vez dentro de la aplicación solo hay que cargar un fichero CSV y rellenar el formulario de muestras indicando la configuración correspondiente (tipo de columnas, número de muestras, valores de las muestras, etc). Después de tener todo listo, solo hay que pulsar en "Predecir muestras", y el sistema empieza a realizar todo el proceso de creación de árboles y predicción de muestras. (Poner foto)  
-9. Cuando estén todas las muestras predichas, automáticamente redirige a la ventana para ver los resultados. Para realizar más predicciones, pulsar en el botón "Predecir" y volver al paso 8.(Poner foto)  
+7. Pulsar en el botón "Registrar" y crear un usuario. ![Registro usuario](readmeImagenes/registro.png)  
+8. Una vez dentro de la aplicación solo hay que cargar un fichero CSV y rellenar el formulario de muestras indicando la configuración correspondiente (tipo de columnas, número de muestras, valores de las muestras, etc). Después de tener todo listo, solo hay que pulsar en "Predecir muestras", y el sistema empieza a realizar todo el proceso de creación de árboles y predicción de muestras. ![Ventana de solicitud de predicciones](readmeImagenes/prediccion.png)    
+9. Cuando estén todas las muestras predichas, automáticamente redirige a la ventana para ver los resultados. Para realizar más predicciones, pulsar en el botón "Predecir" y volver al paso 8. ![Ventana historial](readmeImagenes/historial.png)    
 
 ## Ejecución de la aplicación en Flask
 1. Haber instalado las librerías con el pip de [Requisitos](#requisitos) y estar en el directorio raíz, para cambiar al backend de Flask:
