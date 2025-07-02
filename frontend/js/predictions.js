@@ -224,7 +224,6 @@ document.addEventListener("DOMContentLoaded", () => {
       })
         .then(res => res.ok ? res.text() : res.text().then(t => { throw new Error(t); }))
         .then(async data => {
-          console.log("Header enviado OK:", data);
           targetCol = document.getElementById("targetColumn").value;
           selectedColumns = Object.keys(columnTypes);
           allColumns = selectedColumns.includes(targetCol) ? selectedColumns : [...selectedColumns, targetCol];
