@@ -122,5 +122,5 @@ docker-compose up --build
 2. Es necesario corregir las rutas de los ficheros CSV al igual que el índide máximo del número de filas.
 3. Se genera un txt en la carpeta con los tiempos.  
 
-# Hecho por Hugo Andrés Herrera de Miguel
-# Tutor Sergio Saugar García
+#### Hecho por: Hugo Andrés Herrera de Miguel
+#### Tutor: Sergio Saugar García
