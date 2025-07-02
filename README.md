@@ -57,7 +57,7 @@ Este repositorio contiene todo el código generado para desarrollar el sistema j
 ```
 
 ## Requisitos
-Para usar la aplicación fuera de los contenedore docker o usar la aplicación de Python desarrollada en Flask es necesario tener:
+Tener clonado el repositorio. Para usar la aplicación fuera de los contenedore docker o usar la aplicación de Python desarrollada en Flask es necesario tener:
 - Java 17.0.12
 - Python 3.10.11  
 Y en Python haber hecho este pip install:
