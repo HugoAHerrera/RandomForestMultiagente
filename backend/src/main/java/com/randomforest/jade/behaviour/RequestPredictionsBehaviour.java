@@ -41,6 +41,7 @@ public class RequestPredictionsBehaviour extends CyclicBehaviour {
                 List<PredictionRequestDto> dtoList = (List<PredictionRequestDto>) list;
                 agent.setPredictionsList(dtoList);
 
+                // Ask to all the predictionAgents for their service
                 if (!agent.getPredictionAgents().isEmpty()) {
                     ACLMessage requestMsg = new ACLMessage(ACLMessage.REQUEST);
                     requestMsg.setConversationId("predictions");
@@ -59,6 +60,7 @@ public class RequestPredictionsBehaviour extends CyclicBehaviour {
 
                     int expectedAnswers = 0;
 
+                    // Send the prediction samples
                     for (int i = 0; i < agent.getPredictionAgents().size(); i++) {
                         MessageTemplate mtAgree = MessageTemplate.and(
                             MessageTemplate.MatchConversationId("predictions"),
@@ -73,6 +75,7 @@ public class RequestPredictionsBehaviour extends CyclicBehaviour {
                     int responsesReceived = 0;
                     List<SampleResults> resultsList = new ArrayList<>();
 
+                    // Wait until all answers for the approved requests are received
                     while (responsesReceived < expectedAnswers) {
                         MessageTemplate mtResponse = MessageTemplate.and(
                             MessageTemplate.MatchConversationId("predictions"),
@@ -101,6 +104,7 @@ public class RequestPredictionsBehaviour extends CyclicBehaviour {
                     Map<String, List<Object>> accumulatedSamples = new HashMap<>();
                     Map<String, List<Double>> accuracyMap = new HashMap<>();
 
+                    // Collect all the answers
                     for (SampleResults sampleResult : resultsList) {
                         Map<String, Object> sampleOutputs = sampleResult.getSampleOutputs();
 
@@ -121,6 +125,7 @@ public class RequestPredictionsBehaviour extends CyclicBehaviour {
                         }
                     }
 
+                    // Generate the final result
                     for (Map.Entry<String, List<Object>> entry : accumulatedSamples.entrySet()) {
                         String sampleName = entry.getKey();
                         List<Object> values = entry.getValue();

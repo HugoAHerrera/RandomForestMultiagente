@@ -10,6 +10,11 @@ import java.util.List;
 
 public class BaseAgent extends Agent {
 
+    /**
+     * Registers this agent to the Directory Facilitator (DF).
+     *
+     * @param type type of agent service 
+     */
     protected void registerToDF(String type) {
         DFAgentDescription dfd = new DFAgentDescription();
         dfd.setName(getAID());
@@ -26,6 +31,12 @@ public class BaseAgent extends Agent {
         }
     }
 
+    /**
+     * Searches the Directory Facilitator (DF) for agents registered with the service type.
+     *
+     * @param type type of service to search
+     * @return A list of agent local names
+     */
     public List<String> getAgents(String type) {
         List<String> agents = new ArrayList<>();
         try {

@@ -38,6 +38,7 @@ public class CreatePredictionBehaviour extends CyclicBehaviour {
         if (msg != null) {
             PredictionAgent agent = (PredictionAgent) myAgent;
 
+            // If the agent has the needed content, it agrees, otherwise, it refuses.
             if (agent.getHeader() == null || agent.getCsvBuffer() == null) {
                 ACLMessage refuseMsg = msg.createReply();
                 refuseMsg.setPerformative(ACLMessage.REFUSE);
@@ -50,6 +51,7 @@ public class CreatePredictionBehaviour extends CyclicBehaviour {
                 myAgent.send(agreeMsg);
             }
                
+            // Parse the given content with Common CSV
             List<List<Object>> dataset = new ArrayList<>();
             try {
                 InputStreamReader isr = new InputStreamReader(
@@ -113,6 +115,7 @@ public class CreatePredictionBehaviour extends CyclicBehaviour {
                         }
                     }
 
+                    // For each tree it generates a prediction
                     for(int i = 0; i<agent.getAmountTrees(); i++){
                         DecisionTree decisionTree = new DecisionTree(taskType, agent.getCsvRowCount(), agent.getHeader(), dataset, targetColumn);
                         Node node = decisionTree.generateDecisionTree();
@@ -157,6 +160,7 @@ public class CreatePredictionBehaviour extends CyclicBehaviour {
 
                     ACLMessage replyMsg = msg.createReply();
 
+                    // Send to the Orchestrator Agent the results
                     if (result == null) {
                         replyMsg.setPerformative(ACLMessage.FAILURE);
                         replyMsg.setContent("Prediction failed.");

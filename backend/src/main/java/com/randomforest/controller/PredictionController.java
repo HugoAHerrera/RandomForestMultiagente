@@ -35,9 +35,18 @@ public class PredictionController {
     @Autowired
     private AgentCommunicationService agentCommunicationService;
 
+    /**
+     * Creates predictions.
+     *
+     * @param requestList List of PredictionRequestDto objects
+     * @return ResponseEntity code
+     */
     @CrossOrigin(origins = "*")
     @PostMapping("/prediction")
     public ResponseEntity<String> createPrediction(@RequestBody List<PredictionRequestDto> requestList) {
+        if (requestList == null) {
+            return ResponseEntity.badRequest().body("Invalid request");
+        }
         try {
             agentCommunicationService.sendRequestedPredictions(requestList);
             return ResponseEntity.ok().build();
@@ -47,6 +56,12 @@ public class PredictionController {
         }
     }
 
+    /**
+     * Retrieves the prediction history for a given username.
+     *
+     * @param username username to get prediction history
+     * @return History of Prediction objects
+     */
     @CrossOrigin(origins = "*")
     @GetMapping("/prediction/{username}")
     public List<Prediction> getHistorial(@PathVariable String username) {

@@ -25,24 +25,42 @@ public class FileController {
     @Autowired
     private AgentCommunicationService agentCommunicationService;
 
+    /**
+     * Handles the sending of file header information to the agent communication service.
+     *
+     * @param request HeaderDto object
+     * @return ResponseEntity code
+     */
     @CrossOrigin(origins = "*")
     @PostMapping("/file/header")
     public ResponseEntity<String> handleColumnTypes(@RequestBody HeaderDto request) {
+        if (request == null) {
+            return ResponseEntity.badRequest().body("Invalid request");
+        }
         try {
             agentCommunicationService.sendHeader(request);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                          .body("Error sending header: " + e.getMessage());
         }
     }
 
+    /**
+     * Handles the sending of a file chunk to the agent communication service.
+     *
+     * @param chunk ChunkDto object 
+     * @return ResponseEntity code
+     */
     @CrossOrigin(origins = "*")
     @PostMapping("/file/chunk")
     public ResponseEntity<String> handleFileChunk(@RequestBody ChunkDto chunk) {
+        if (chunk == null) {
+            return ResponseEntity.badRequest().body("Invalid request");
+        }
         try {
             agentCommunicationService.sendChunk(chunk);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                          .body("Error handling file rows: " + e.getMessage());

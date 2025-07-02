@@ -38,6 +38,7 @@ public class PredictionAgent extends BaseAgent {
 
     @Override
     protected void setup() {
+        // Register agent with the DF
         registerToDF("prediction");
         addBehaviour(new StoreHeaderBehaviour(this));
         addBehaviour(new StoreRowsChunk(this));

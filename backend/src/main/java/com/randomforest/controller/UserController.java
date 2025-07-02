@@ -20,9 +20,18 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    /**
+     * Registers a new user.
+     *
+     * @param params Map containing username and password
+     * @return ResponseEntity code
+     */
     @CrossOrigin(origins = "*")
     @PostMapping("/user/register")
     public ResponseEntity<?> register(@RequestBody Map<String, String> params) {
+        if (params == null) {
+            return ResponseEntity.badRequest().body("Invalid request");
+        }
         String username = params.get("username");
         String password = params.get("password");
 
@@ -31,17 +40,26 @@ public class UserController {
         }
 
         userService.registerUser(username, password);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    /**
+     * Logs in a user by validating their credentials.
+     *
+     * @param params Map containing username and password
+     * @return ResponseEntity code
+     */
     @CrossOrigin(origins = "*")
     @PostMapping("/user/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> params) {
+        if (params == null) {
+            return ResponseEntity.badRequest().body("Invalid request");
+        }
         String username = params.get("username");
         String password = params.get("password");
 
         if(userService.validateUser(username, password)) {
-            return ResponseEntity.ok().build();
+            return ResponseEntity.status(HttpStatus.CREATED).build();
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

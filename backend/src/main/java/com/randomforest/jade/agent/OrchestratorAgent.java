@@ -30,8 +30,10 @@ public class OrchestratorAgent extends BaseAgent {
 
     @Override
     protected void setup() {
+        // Declare a Queue size
         setEnabledO2ACommunication(true, 40000000);
 
+        // Needed to use predictionService
         PredictionService predictionService = SpringContext.getBean(PredictionService.class);
 
         addBehaviour(new ShareHeaderBehaviour(this));
