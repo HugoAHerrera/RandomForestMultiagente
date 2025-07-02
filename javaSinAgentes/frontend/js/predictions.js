@@ -237,7 +237,7 @@ document.addEventListener("DOMContentLoaded", () => {
               const res = await fetch("/api/file/chunk", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ types: columnTypes, rows: chunk })
+                body: JSON.stringify({ rows: chunk })
               });
               if (!res.ok) throw new Error(await res.text());
             } catch (err) {
