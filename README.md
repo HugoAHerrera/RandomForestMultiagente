@@ -104,20 +104,23 @@ cd .\python\flask\backend\
 ```
 py app.py
 ```
-Esperar a que aparezca el mensaje "Running on http://127.0.0.1:5000"  
-3. Buscar en el navegador "localhost:5000"  
-La funcionalidad es la misma que la descrita en punto 6 de [Ejecución de la aplicación java SMA](#ejecución-de-la-aplicación-java-sma), solo que no hay ventana de inicio de sesión, los resultados de las predicciones se imprimen en el terminal  
+Esperar a que aparezca el mensaje "Running on http://127.0.0.1:5000".  
+3. Buscar en el navegador "localhost:5000".  
+La funcionalidad es la misma que la descrita en punto 6 de [Ejecución de la aplicación java SMA](#ejecución-de-la-aplicación-java-sma), solo que no hay ventana de inicio de sesión, los resultados de las predicciones se imprimen en el terminal.  
 
 ## Ejecución de la aplicación Java sin SMA
 1. Estar en el directorio raíz, para cambiar al directorio "javaSinAgentes":
 ```
 cd .\javaSinAgentes\
 ```
-2. Crear los contenedores e imágenes Docker y seguir el mismo proceso desde el punto 6 de [Ejecución de la aplicación java SMA](#ejecución-de-la-aplicación-java-sma)  
+2. Crear los contenedores e imágenes Docker y seguir el mismo proceso desde el punto 6 de [Ejecución de la aplicación java SMA](#ejecución-de-la-aplicación-java-sma).  
 ```
 docker-compose up --build
 ```
 ## Ejecución de las pruebas de tiempos
-1. Se recomienda ejecutar las pruebas desde un IDE como Visual Studio Code o IntelliJ IDEA
-2. Es necesario corregir las rutas de los ficheros CSV al igual que el índide máximo del número de filas
-3. Se genera un txt en la carpeta con los tiempos  
+1. Se recomienda ejecutar las pruebas desde un IDE como Visual Studio Code o IntelliJ IDEA.
+2. Es necesario corregir las rutas de los ficheros CSV al igual que el índide máximo del número de filas.
+3. Se genera un txt en la carpeta con los tiempos.  
+
+# Hecho por Hugo Andrés Herrera de Miguel
+# Tutor Sergio Saugar García
